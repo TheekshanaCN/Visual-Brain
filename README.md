@@ -2,7 +2,7 @@
 
 **Visual Brain** is an intelligent tool that transforms messy thoughts, notes, and ideas into structured, visual clusters. Powered by Google's Gemini AI, it organizes your raw input into a clear, interactive mind map, providing summaries, key themes, and actionable next steps.
 
-![Visual Brain](https://placehold.co/600x400/1a1a1a/ffffff?text=Visual+Brain+Preview)
+![Visual Brain](https://raw.githubusercontent.com/TheekshanaCN/Visual-Brain/refs/heads/main/public/og-image.JPG?token=GHSAT0AAAAAADN3UTPSW2CTIMZDHJFZZ2EC2JB5JTA)
 
 ## ✨ Features
 
