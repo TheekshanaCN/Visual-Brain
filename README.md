@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Visual Brain 🧠
 
-## Getting Started
+**Visual Brain** is an intelligent tool that transforms messy thoughts, notes, and ideas into structured, visual clusters. Powered by Google's Gemini AI, it organizes your raw input into a clear, interactive mind map, providing summaries, key themes, and actionable next steps.
 
-First, run the development server:
+![Visual Brain](https://placehold.co/600x400/1a1a1a/ffffff?text=Visual+Brain+Preview)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **AI Auto-Clustering**: Automatically groups raw text into logical categories and sub-items.
+- **Interactive Visual Map**: Draggable nodes and connections using [React Flow](https://reactflow.dev/).
+- **AI Insights Panel**: Generates a concise summary, identifies key themes, and suggests next steps.
+- **Snapshot Export**: Export your visual graph as a high-quality PNG image.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+- **Visualization**: [React Flow](https://reactflow.dev/)
+- **AI Model**: [Google Gemini 2.0 Flash](https://ai.google.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-## Learn More
+## 🚀 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Node.js (v18 or higher)
+- pnpm (recommended) or npm/yarn
+- A [Google Gemini API Key](https://aistudio.google.com/app/apikey)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
 
-## Deploy on Vercel
+1.  **Clone the repository:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    ```bash
+    git clone https://github.com/yourusername/visual-brain.git
+    cd visual-brain
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2.  **Install dependencies:**
+
+    ```bash
+    pnpm install
+    ```
+
+3.  **Set up Environment Variables:**
+
+    Create a `.env.local` file in the root directory and add your Gemini API key:
+
+    ```env
+    GEMINI_API_KEY=your_api_key_here
+    ```
+
+4.  **Run the development server:**
+
+    ```bash
+    pnpm dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📖 Usage
+
+1.  **Input**: Paste your raw notes, brainstorming ideas, or random thoughts into the text box on the left.
+2.  **Visualize**: Click the **"Visualize"** button. The AI will process your text (this may take a few seconds).
+3.  **Explore**:
+    - **Map**: Interact with the generated nodes. Drag them around to organize your thoughts.
+    - **Insights**: Check the panel on the right for a summary and actionable steps.
+4.  **Export**: Click **"Export Snapshot"** at the bottom to save your map as an image.
+
+
+## 👤 Author
+
+**Theekshana**
+
+- [GitHub](https://github.com/TheekshanaCN)
+- [LinkedIn](https://www.linkedin.com/in/theekshana-chamodhya)
+- [X (Twitter)](https://x.com/theekshana_c_n)
+
+---
+
+*Built with ❤️ using Next.js and Gemini AI.*

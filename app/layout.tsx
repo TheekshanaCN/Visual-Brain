@@ -14,7 +14,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Visual Brain",
-  description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps.",
+  description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps. By Theekshana.",
+  openGraph: {
+    title: "Visual Brain",
+    description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps. By Theekshana.",
+    images: ["/og-image.JPG"],
+  },
 };
 
 export default function RootLayout({
