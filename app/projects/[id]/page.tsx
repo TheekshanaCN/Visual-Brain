@@ -1,0 +1,79 @@
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import connectToDatabase from '@/lib/db';
+import Project from '@/models/Project';
+import ProjectInitializer from '@/components/ProjectInitializer';
+import InputSection from '@/components/InputSection';
+import VisualMap from '@/components/VisualMap';
+import InsightsPanel from '@/components/InsightsPanel';
+import EmptyState from '@/components/EmptyState';
+import SideToolbar from '@/components/SideToolbar';
+import FlowProvider from '@/components/FlowProvider';
+import Navbar from '@/components/Navbar';
+
+interface ProjectPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function ProjectPage({ params }: ProjectPageProps) {
+  const { userId } = await auth();
+  if (!userId) {
+    redirect('/sign-in');
+  }
+
+  const { id } = await params;
+  await connectToDatabase();
+
+  // Use lean() to get a plain JS object, which is serializable
+  const project = await Project.findOne({ _id: id, userId }).lean();
+
+  if (!project) {
+    redirect('/dashboard');
+  }
+
+  // Convert _id and dates to strings to avoid serialization issues
+  const serializedProject = {
+    ...project,
+    _id: project._id.toString(),
+    createdAt: project.createdAt?.toISOString(),
+    updatedAt: project.updatedAt?.toISOString(),
+  };
+
+  return (
+    <main className="relative w-screen h-screen overflow-hidden bg-background text-foreground selection:bg-primary/30 transition-colors duration-300">
+      <ProjectInitializer project={serializedProject as any} />
+
+      {/* Enhanced Background Gradients */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
+      </div>
+
+      <Navbar />
+
+      {/* Main Components */}
+      <div className="h-full relative">
+        <FlowProvider>
+          <SideToolbar />
+          <InputSection />
+          <VisualMap />
+          <InsightsPanel />
+          <EmptyState />
+        </FlowProvider>
+      </div>
+
+      {/* Overlay for small screens */}
+      <div className="md:hidden absolute inset-0 z-50 bg-background/80 flex items-center justify-center p-8 text-center backdrop-blur-sm">
+        <div className="max-w-sm">
+          <p className="text-muted-foreground mb-4">
+            Please use a larger screen for the best Visual Brain experience.
+          </p>
+          <p className="text-xs text-muted-foreground/70">
+            Minimum recommended width: 768px
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}

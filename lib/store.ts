@@ -30,6 +30,9 @@ interface AppState {
   clusters: Cluster[];
   insight: Insight | null;
   isProcessing: boolean;
+  insightsPanelOpen: boolean;
+  inputDockOpen: boolean;
+  inputValue: string;
   
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -41,6 +44,9 @@ interface AppState {
   setClusters: (clusters: Cluster[]) => void;
   setInsight: (insight: Insight) => void;
   setIsProcessing: (isProcessing: boolean) => void;
+  toggleInsightsPanel: () => void;
+  setInputDockOpen: (open: boolean) => void;
+  setInputValue: (value: string) => void;
   reset: () => void;
 }
 
@@ -50,6 +56,9 @@ export const useStore = create<AppState>((set, get) => ({
   clusters: [],
   insight: null,
   isProcessing: false,
+  insightsPanelOpen: true,
+  inputDockOpen: false,
+  inputValue: '',
 
   onNodesChange: (changes: NodeChange[]) => {
     set({
@@ -73,5 +82,8 @@ export const useStore = create<AppState>((set, get) => ({
   setClusters: (clusters: Cluster[]) => set({ clusters }),
   setInsight: (insight: Insight) => set({ insight }),
   setIsProcessing: (isProcessing: boolean) => set({ isProcessing }),
+  toggleInsightsPanel: () => set({ insightsPanelOpen: !get().insightsPanelOpen }),
+  setInputDockOpen: (open: boolean) => set({ inputDockOpen: open }),
+  setInputValue: (value: string) => set({ inputValue: value }),
   reset: () => set({ nodes: [], edges: [], clusters: [], insight: null, isProcessing: false }),
 }));

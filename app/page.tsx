@@ -1,31 +1,40 @@
-import InputSection from '@/components/InputSection';
-import VisualMap from '@/components/VisualMap';
-import InsightsPanel from '@/components/InsightsPanel';
-import Toolbar from '@/components/Toolbar';
-import Footer from '@/components/Footer';
+'use client';
+
+import Navbar from '@/components/Navbar';
+import Hero from '@/components/landing/Hero';
+import BentoGrid from '@/components/landing/BentoGrid';
+import InteractiveDemo from '@/components/landing/InteractiveDemo';
+import { Brain } from 'lucide-react';
 
 export default function Home() {
-  return (
-    <main className="relative w-screen h-screen overflow-hidden bg-neutral-950 text-white selection:bg-blue-500/30">
-      {/* Background Gradients */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px]" />
-      </div>
+    return (
+        <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 overflow-x-hidden transition-colors duration-300">
+            <Navbar />
 
-      {/* Main Components */}
-      <InputSection />
-      <VisualMap />
-      <InsightsPanel />
-      <Toolbar />
-      <Footer />
-      
-      {/* Overlay for small screens (optional) */}
-      <div className="md:hidden absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-8 text-center backdrop-blur-sm">
-        <p className="text-white/70">
-          Please use a larger screen for the best Visual Brain experience.
-        </p>
-      </div>
-    </main>
-  );
+            <Hero />
+            <BentoGrid />
+            <InteractiveDemo />
+
+            {/* Footer */}
+            <footer className="py-20 px-6 border-t border-border bg-card/50 backdrop-blur-lg">
+                <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                            <Brain className="w-6 h-6 text-primary" />
+                        </div>
+                        <span className="font-bold text-xl tracking-tight">Visual Brain</span>
+                    </div>
+                    <div className="flex gap-8 text-sm font-medium text-muted-foreground">
+                        <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
+                        <a href="#" className="hover:text-foreground transition-colors">Terms</a>
+                        <a href="#" className="hover:text-foreground transition-colors">Twitter</a>
+                        <a href="#" className="hover:text-foreground transition-colors">GitHub</a>
+                    </div>
+                    <div className="text-muted-foreground text-sm">
+                        © {new Date().getFullYear()} Visual Brain.
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
 }
