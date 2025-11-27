@@ -15,6 +15,7 @@ export default function InputSection() {
     setInsight,
     setNodes,
     setEdges,
+    setTags,
     reset,
     nodes
   } = useStore();
@@ -51,8 +52,10 @@ export default function InputSection() {
 
       if (data.clusters) {
         setClusters(data.clusters);
-        // ... (Node generation logic would go here, simplified for brevity as it's same as before)
-        // For this redesign, we focus on the UI. The store logic handles the rest.
+
+        // Generate mock tags based on input (replace with API later)
+        const mockTags = ["AI", "React", "Next.js", "Design"];
+        setTags(mockTags);
 
         // Re-implementing the node generation for completeness
         const newNodes: any[] = [];

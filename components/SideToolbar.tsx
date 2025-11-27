@@ -23,6 +23,13 @@ export default function SideToolbar() {
         if (!viewport) return;
 
         try {
+            // Temporarily hide card nodes for the snapshot
+            const cardNodes = viewport.querySelectorAll('[data-id^="card-"]');
+            cardNodes.forEach(node => {
+                (node as HTMLElement).style.display = 'none';
+            });
+
+            // Take the snapshot
             const dataUrl = await toPng(viewport, {
                 backgroundColor: theme === 'dark' ? '#0a0a0a' : '#ffffff',
                 width: viewport.scrollWidth,
@@ -34,12 +41,23 @@ export default function SideToolbar() {
                 }
             });
 
+            // Restore card nodes visibility
+            cardNodes.forEach(node => {
+                (node as HTMLElement).style.display = '';
+            });
+
             const link = document.createElement('a');
             link.download = 'visual-brain-snapshot.png';
             link.href = dataUrl;
             link.click();
         } catch (error) {
             console.error('Export failed:', error);
+
+            // Ensure card nodes are restored even if export fails
+            const cardNodes = viewport.querySelectorAll('[data-id^="card-"]');
+            cardNodes.forEach(node => {
+                (node as HTMLElement).style.display = '';
+            });
         }
     };
 

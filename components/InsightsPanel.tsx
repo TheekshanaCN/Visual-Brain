@@ -45,7 +45,7 @@ export default function InsightsPanel() {
             className="fixed top-0 right-0 bottom-0 z-30 w-[400px] bg-background/95 backdrop-blur-xl border-l border-border shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-border/50">
+            <div className="flex items-center justify-between px-6 py-15 border-b border-border/50">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <h3 className="text-base font-semibold text-foreground">

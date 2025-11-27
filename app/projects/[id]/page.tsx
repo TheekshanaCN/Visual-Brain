@@ -9,7 +9,9 @@ import InsightsPanel from '@/components/InsightsPanel';
 import EmptyState from '@/components/EmptyState';
 import SideToolbar from '@/components/SideToolbar';
 import FlowProvider from '@/components/FlowProvider';
-import Navbar from '@/components/Navbar';
+import ProjectNavbarWrapper from '@/components/project/ProjectNavbarWrapper';
+import ProjectCards from '@/components/project/ProjectCards';
+import NavigationDock from '@/components/project/NavigationDock';
 
 interface ProjectPageProps {
   params: Promise<{ id: string }>;
@@ -40,7 +42,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   };
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-background text-foreground selection:bg-primary/30 transition-colors duration-300">
+    <main className="relative w-screen h-screen overflow-hidden bg-background text-foreground selection:bg-primary/30 transition-colors duration-300 pt-[46px] pb-2 px-2">
       <ProjectInitializer project={serializedProject as any} />
 
       {/* Enhanced Background Gradients */}
@@ -50,17 +52,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
       </div>
 
-      <Navbar />
+      <ProjectNavbarWrapper projectId={serializedProject._id} initialProjectName={serializedProject.name} />
 
       {/* Main Components */}
       <div className="h-full relative">
-        <FlowProvider>
-          <SideToolbar />
-          <InputSection />
-          <VisualMap />
-          <InsightsPanel />
-          <EmptyState />
-        </FlowProvider>
+        <div className="rounded-lg overflow-hidden w-full h-full relative">
+          <FlowProvider>
+            <VisualMap />
+            <ProjectCards />
+            <NavigationDock />
+            <InputSection />
+            <SideToolbar />
+          </FlowProvider>
+        </div>
       </div>
 
       {/* Overlay for small screens */}

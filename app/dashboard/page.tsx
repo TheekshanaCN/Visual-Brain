@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { Plus, Calendar, ArrowRight, Loader2, FolderOpen } from 'lucide-react';
+import { Plus, Calendar, ArrowRight, Loader2, FolderOpen, Trash2, MoreVertical, Pencil } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface Project {
     _id: string;
@@ -30,6 +46,12 @@ export default function Dashboard() {
     const [newProjectName, setNewProjectName] = useState('');
     const [newProjectDesc, setNewProjectDesc] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [editProject, setEditProject] = useState<Project | null>(null);
+    const [editProjectName, setEditProjectName] = useState('');
+    const [editProjectDesc, setEditProjectDesc] = useState('');
+    const [updating, setUpdating] = useState(false);
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
@@ -76,6 +98,52 @@ export default function Dashboard() {
         } catch (error) {
             console.error('Failed to create project', error);
             setCreating(false);
+        }
+    };
+
+    const handleEditProject = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editProjectName.trim() || !editProject) return;
+
+        setUpdating(true);
+        try {
+            const res = await fetch(`/api/projects/${editProject._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: editProjectName.trim(), description: editProjectDesc }),
+            });
+
+            if (res.ok) {
+                const updatedProject = await res.json();
+                setProjects(projects.map(p => p._id === updatedProject._id ? updatedProject : p));
+                setEditProject(null);
+                setEditProjectName('');
+                setEditProjectDesc('');
+            }
+        } catch (error) {
+            console.error('Failed to update project', error);
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleDeleteProject = async () => {
+        if (!deleteProjectId) return;
+
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/projects/${deleteProjectId}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                setProjects(projects.filter(p => p._id !== deleteProjectId));
+                setDeleteProjectId(null);
+            }
+        } catch (error) {
+            console.error('Failed to delete project', error);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -174,32 +242,168 @@ export default function Dashboard() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                             >
-                                <Link href={`/projects/${project._id}`}>
-                                    <Card className="group hover:border-primary/50 hover:shadow-md transition-all duration-300 h-full flex flex-col">
+                                <Card className="hover:border-primary/50 hover:shadow-md transition-all duration-300 h-full flex flex-col">
+                                    <Link href={`/projects/${project._id}`}>
                                         <CardHeader>
                                             <div className="flex justify-between items-start">
-                                                <CardTitle className="line-clamp-1 group-hover:text-primary transition-colors">
+                                                <CardTitle className="line-clamp-1 hover:text-primary transition-colors">
                                                     {project.name}
                                                 </CardTitle>
-                                                <ArrowRight className="w-5 h-5 text-muted-foreground -rotate-45 group-hover:rotate-0 group-hover:text-primary transition-all duration-300" />
+                                                <ArrowRight className="w-5 h-5 text-muted-foreground -rotate-45 hover:rotate-0 hover:text-primary transition-all duration-300" />
                                             </div>
                                             <CardDescription className="line-clamp-2 h-10">
                                                 {project.description || 'No description'}
                                             </CardDescription>
                                         </CardHeader>
-                                        <CardFooter className="mt-auto pt-0 text-xs text-muted-foreground">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4" />
-                                                <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
-                                            </div>
-                                        </CardFooter>
-                                    </Card>
-                                </Link>
+                                    </Link>
+                                    <CardFooter className="mt-auto pt-0 text-xs text-muted-foreground flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="w-4 h-4" />
+                                            <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 hover:bg-accent"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }}
+                                                >
+                                                    <MoreVertical className="w-4 h-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    className="cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setEditProject(project);
+                                                        setEditProjectName(project.name);
+                                                        setEditProjectDesc(project.description || '');
+                                                    }}
+                                                >
+                                                    <Pencil className="w-4 h-4 mr-2" />
+                                                    Edit Project
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="text-destructive focus:text-destructive cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setDeleteProjectId(project._id);
+                                                    }}
+                                                >
+                                                    <Trash2 className="w-4 h-4 mr-2" />
+                                                    Delete Project
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </CardFooter>
+                                </Card>
                             </motion.div>
                         ))}
                     </div>
                 )}
             </main>
+
+            <AlertDialog open={!!deleteProjectId} onOpenChange={(open) => !open && setDeleteProjectId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your project
+                            and all associated data.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteProject}
+                            disabled={deleting}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            {deleting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                'Delete'
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Edit Project Dialog */}
+            <Dialog open={!!editProject} onOpenChange={(open) => {
+                if (!open) {
+                    setEditProject(null);
+                    setEditProjectName('');
+                    setEditProjectDesc('');
+                }
+            }}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Edit Project</DialogTitle>
+                        <DialogDescription>
+                            Update your project details.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleEditProject}>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="edit-name">Project Name</Label>
+                                <Input
+                                    id="edit-name"
+                                    value={editProjectName}
+                                    onChange={(e) => setEditProjectName(e.target.value)}
+                                    placeholder="e.g., Marketing Strategy"
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="edit-description">Description (Optional)</Label>
+                                <Textarea
+                                    id="edit-description"
+                                    value={editProjectDesc}
+                                    onChange={(e) => setEditProjectDesc(e.target.value)}
+                                    placeholder="Brief description..."
+                                    className="resize-none"
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    setEditProject(null);
+                                    setEditProjectName('');
+                                    setEditProjectDesc('');
+                                }}
+                                disabled={updating}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={!editProjectName.trim() || updating}>
+                                {updating ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                        Updating...
+                                    </>
+                                ) : (
+                                    'Save Changes'
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

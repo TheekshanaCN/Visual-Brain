@@ -6,6 +6,7 @@ import { useStore } from '@/lib/store';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, useMemo } from 'react';
 import GlassNode from './GlassNode';
+import CardNode from './project/nodes/CardNode';
 
 export default function VisualMap() {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useStore();
@@ -14,6 +15,7 @@ export default function VisualMap() {
 
   const nodeTypes = useMemo<NodeTypes>(() => ({
     glass: GlassNode,
+    card: CardNode,
   }), []);
 
   useEffect(() => {
@@ -36,13 +38,15 @@ export default function VisualMap() {
         fitView
         proOptions={{ hideAttribution: true }}
         className="bg-background transition-colors duration-300"
+        minZoom={0.1}
+        maxZoom={2}
       >
         <Background
           color={isDark ? '#333' : '#e5e7eb'}
           gap={20}
         />
-        {/* <Controls className={`${isDark ? 'bg-black/50 border-white/10 text-white fill-white' : 'bg-white/50 border-black/10 text-black fill-black'} backdrop-blur-md rounded-lg border shadow-lg`} /> */}
-        {/* <MiniMap
+        {/* <Controls className={`${isDark ? 'bg-black/50 border-white/10 text-white fill-white' : 'bg-white/50 border-black/10 text-black fill-black'} backdrop-blur-md rounded-lg border shadow-lg`} />
+        <MiniMap
           className={`${isDark ? 'bg-black/50 border-white/10' : 'bg-white/50 border-black/10'} backdrop-blur-md rounded-lg border shadow-lg`}
           nodeColor={isDark ? '#3b82f6' : '#2563eb'}
           maskColor={isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)'}
