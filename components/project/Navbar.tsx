@@ -77,7 +77,7 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
     };
 
     return (
-        <header className="fixed top-0 left-0 w-full bg-background/60 backdrop-blur-md z-50 border-b border-border/40">
+        <header className="fixed top-0 left-0 w-full bg-background/60 backdrop-blur-md z-50">
             <div className="w-full max-w-8xl mx-auto px-6 flex items-center justify-between h-[46px]">
 
                 <div className="flex items-center gap-4">

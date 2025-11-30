@@ -48,17 +48,15 @@ interface AppState {
   edges: Edge[];
   clusters: Cluster[];
   insight: Insight | null;
-  tags: string[];
   techStack: TechItem[];
   mvpChecklist: ChecklistItem[];
   nextSteps: NextStepItem[];
   
   isProcessing: boolean;
-  isGenerating: boolean; // General generating state
-  
   insightsPanelOpen: boolean;
   inputDockOpen: boolean;
   inputValue: string;
+  editingNodeId: string | null;
   
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -67,16 +65,17 @@ interface AppState {
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   addNode: (node: Node) => void;
+  addManualNode: (position: { x: number; y: number }, label?: string) => void;
+  deleteNode: (nodeId: string) => void;
+  updateNodeLabel: (nodeId: string, label: string) => void;
+  setEditingNodeId: (nodeId: string | null) => void;
   setClusters: (clusters: Cluster[]) => void;
-  setInsight: (insight: Insight | null) => void;
-  setTags: (tags: string[]) => void;
+  setInsight: (insight: Insight) => void;
   setTechStack: (stack: TechItem[]) => void;
   setMvpChecklist: (checklist: ChecklistItem[]) => void;
   setNextSteps: (steps: NextStepItem[]) => void;
   
   setIsProcessing: (isProcessing: boolean) => void;
-  setIsGenerating: (isGenerating: boolean) => void;
-  
   toggleInsightsPanel: () => void;
   setInputDockOpen: (open: boolean) => void;
   setInputValue: (value: string) => void;
@@ -88,14 +87,12 @@ export const useStore = create<AppState>((set, get) => ({
   edges: [],
   clusters: [],
   insight: null,
-  tags: [],
   techStack: [],
   mvpChecklist: [],
   nextSteps: [],
   
   isProcessing: false,
-  isGenerating: false,
-  
+  editingNodeId: null,
   insightsPanelOpen: true,
   inputDockOpen: false,
   inputValue: '',
@@ -119,16 +116,41 @@ export const useStore = create<AppState>((set, get) => ({
   setNodes: (nodes: Node[]) => set({ nodes }),
   setEdges: (edges: Edge[]) => set({ edges }),
   addNode: (node: Node) => set({ nodes: [...get().nodes, node] }),
+  
+  addManualNode: (position: { x: number; y: number }, label?: string) => {
+    const newNode: Node = {
+      id: `manual-${Date.now()}`,
+      type: 'glass',
+      position,
+      data: { label: label || 'New Node' },
+    };
+    set({ nodes: [...get().nodes, newNode] });
+  },
+  
+  deleteNode: (nodeId: string) => {
+    const nodes = get().nodes.filter(node => node.id !== nodeId);
+    const edges = get().edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId);
+    set({ nodes, edges });
+  },
+  
+  updateNodeLabel: (nodeId: string, label: string) => {
+    const nodes = get().nodes.map(node => 
+      node.id === nodeId 
+        ? { ...node, data: { ...node.data, label } }
+        : node
+    );
+    set({ nodes });
+  },
+  
+  setEditingNodeId: (nodeId: string | null) => set({ editingNodeId: nodeId }),
+  
   setClusters: (clusters: Cluster[]) => set({ clusters }),
-  setInsight: (insight: Insight | null) => set({ insight }),
-  setTags: (tags: string[]) => set({ tags }),
+  setInsight: (insight: Insight) => set({ insight }),
   setTechStack: (techStack: TechItem[]) => set({ techStack }),
   setMvpChecklist: (mvpChecklist: ChecklistItem[]) => set({ mvpChecklist }),
   setNextSteps: (nextSteps: NextStepItem[]) => set({ nextSteps }),
   
   setIsProcessing: (isProcessing: boolean) => set({ isProcessing }),
-  setIsGenerating: (isGenerating: boolean) => set({ isGenerating }),
-  
   toggleInsightsPanel: () => set({ insightsPanelOpen: !get().insightsPanelOpen }),
   setInputDockOpen: (open: boolean) => set({ inputDockOpen: open }),
   setInputValue: (value: string) => set({ inputValue: value }),
@@ -137,11 +159,10 @@ export const useStore = create<AppState>((set, get) => ({
     edges: [], 
     clusters: [], 
     insight: null, 
-    tags: [],
     techStack: [],
     mvpChecklist: [],
     nextSteps: [],
-    isProcessing: false,
-    isGenerating: false
+    isProcessing: false, 
+    editingNodeId: null 
   }),
 }));
