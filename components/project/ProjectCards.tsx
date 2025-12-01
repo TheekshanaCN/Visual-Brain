@@ -3,7 +3,10 @@
 import { useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { Lightbulb, Code, CheckSquare, ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
 import type { CardNodeData } from './nodes/CardNode';
+import KanbanBoard from './KanbanBoard';
+import NextStepsList from './NextStepsList';
 
 export default function ProjectCards() {
     const {
@@ -16,8 +19,7 @@ export default function ProjectCards() {
         mvpChecklist,
         setMvpChecklist,
         nextSteps,
-        setNextSteps,
-        isGenerating
+        setNextSteps
     } = useStore();
 
     // Add card nodes to the ReactFlow canvas when data exists
@@ -39,7 +41,7 @@ export default function ProjectCards() {
                     title: 'AI Insights',
                     icon: <Lightbulb className="w-4 h-4" />,
                     hasData: !!insight,
-                    isGenerating,
+                    isGenerating: false,
                     onGenerate: () => {
                         setInsight({
                             summary: "This project aims to build a comprehensive visual workspace...",
@@ -77,13 +79,43 @@ export default function ProjectCards() {
                     title: 'Tech Stack',
                     icon: <Code className="w-4 h-4" />,
                     hasData: techStack.length > 0,
-                    isGenerating,
-                    onGenerate: () => {
-                        setTechStack([
-                            { name: "Next.js", category: "Frontend", reason: "React framework" },
-                            { name: "Tailwind CSS", category: "Styling", reason: "Utility-first" },
-                            { name: "Framer Motion", category: "Animation", reason: "Smooth interactions" }
-                        ]);
+                    isGenerating: false, // Initial state, will be managed via node updates
+                    onGenerate: async () => {
+                        // 1. Set loading state
+                        const updateNodeLoading = (isLoading: boolean) => {
+                            setNodes(useStore.getState().nodes.map(n =>
+                                n.id === 'card-tech'
+                                    ? { ...n, data: { ...n.data, isGenerating: isLoading } }
+                                    : n
+                            ));
+                        };
+
+                        updateNodeLoading(true);
+
+                        try {
+                            const res = await fetch('/api/process', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    text: insight?.summary || "SaaS Project",
+                                    type: 'tech-stack'
+                                }),
+                            });
+
+                            if (!res.ok) {
+                                const errText = await res.text();
+                                throw new Error(`Generation failed: ${res.status} ${errText}`);
+                            }
+
+                            const data = await res.json();
+                            setTechStack(data);
+                            toast.success('Tech Stack generated!');
+                        } catch (error) {
+                            console.error(error);
+                            toast.error('Failed to generate Tech Stack');
+                        } finally {
+                            updateNodeLoading(false);
+                        }
                     },
                     content: techStack.length > 0 ? (
                         <div className="space-y-3">
@@ -112,27 +144,67 @@ export default function ProjectCards() {
                     title: 'MVP Checklist',
                     icon: <CheckSquare className="w-4 h-4" />,
                     hasData: mvpChecklist.length > 0,
-                    isGenerating,
-                    onGenerate: () => {
-                        setMvpChecklist([
-                            { id: "1", task: "Initialize Project", status: "completed" },
-                            { id: "2", task: "Setup Database", status: "pending" },
-                            { id: "3", task: "Create API Routes", status: "pending" }
-                        ]);
+                    isGenerating: false,
+                    onGenerate: async () => {
+                        const updateNodeLoading = (isLoading: boolean) => {
+                            setNodes(useStore.getState().nodes.map(n =>
+                                n.id === 'card-mvp'
+                                    ? { ...n, data: { ...n.data, isGenerating: isLoading } }
+                                    : n
+                            ));
+                        };
+
+                        updateNodeLoading(true);
+
+                        try {
+                            const res = await fetch('/api/process', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    text: insight?.summary || "SaaS Project",
+                                    type: 'mvp'
+                                }),
+                            });
+
+                            if (!res.ok) {
+                                const errText = await res.text();
+                                throw new Error(`Generation failed: ${res.status} ${errText}`);
+                            }
+
+                            const data = await res.json();
+
+                            // Transform API response (Kanban) to ChecklistItem[]
+                            const newChecklist: any[] = [];
+
+                            if (data.todo) {
+                                data.todo.forEach((task: string, i: number) =>
+                                    newChecklist.push({ id: `todo-${i}`, task, status: 'pending' })
+                                );
+                            }
+                            if (data.inProgress) {
+                                data.inProgress.forEach((task: string, i: number) =>
+                                    newChecklist.push({ id: `prog-${i}`, task, status: 'in-progress' })
+                                );
+                            }
+                            if (data.done) {
+                                data.done.forEach((task: string, i: number) =>
+                                    newChecklist.push({ id: `done-${i}`, task, status: 'completed' })
+                                );
+                            }
+
+                            setMvpChecklist(newChecklist);
+                            toast.success('MVP Checklist generated!');
+                        } catch (error) {
+                            toast.error('Failed to generate MVP Checklist');
+                        } finally {
+                            updateNodeLoading(false);
+                        }
                     },
                     content: mvpChecklist.length > 0 ? (
-                        <div className="space-y-2">
-                            {mvpChecklist.map((item) => (
-                                <div key={item.id} className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors group">
-                                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${item.status === 'completed' ? 'bg-green-500/20 border-green-500/50' : 'border-muted-foreground/40'}`}>
-                                        {item.status === 'completed' && <div className="w-2 h-2 rounded-sm bg-green-500" />}
-                                    </div>
-                                    <span className={`text-sm ${item.status === 'completed' ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                                        {item.task}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
+                        <KanbanBoard
+                            items={mvpChecklist}
+                            onUpdate={setMvpChecklist}
+                        />
                     ) : null
                 } as CardNodeData,
                 draggable: true,
@@ -146,7 +218,7 @@ export default function ProjectCards() {
                     title: 'Next Steps',
                     icon: <ArrowRight className="w-4 h-4" />,
                     hasData: nextSteps.length > 0,
-                    isGenerating,
+                    isGenerating: false,
                     onGenerate: () => {
                         setNextSteps([
                             { id: "1", title: "User Research", description: "Interview potential users", priority: "high" },
@@ -154,22 +226,10 @@ export default function ProjectCards() {
                         ]);
                     },
                     content: nextSteps.length > 0 ? (
-                        <div className="space-y-3">
-                            {nextSteps.map((step) => (
-                                <div key={step.id} className="p-3 rounded-xl bg-gradient-to-br from-background to-muted/30 border border-border/50">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className="font-medium text-sm">{step.title}</span>
-                                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${step.priority === 'high' ? 'bg-red-500/10 text-red-500' :
-                                                step.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-500' :
-                                                    'bg-blue-500/10 text-blue-500'
-                                            }`}>
-                                            {step.priority}
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">{step.description}</p>
-                                </div>
-                            ))}
-                        </div>
+                        <NextStepsList
+                            items={nextSteps}
+                            onUpdate={setNextSteps}
+                        />
                     ) : null
                 } as CardNodeData,
                 draggable: true,

@@ -93,7 +93,7 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
                     {/* Tags Display */}
                     {tags && tags.length > 0 && (
                         <div className="hidden md:flex items-center gap-2 ml-2 pl-4 border-l border-border/40 h-6">
-                            {tags.map((tag, i) => (
+                            {tags.slice(0, 3).map((tag, i) => (
                                 <span
                                     key={i}
                                     className="px-2 py-0.5 rounded-md bg-secondary/50 text-secondary-foreground text-[10px] font-medium border border-border/50"

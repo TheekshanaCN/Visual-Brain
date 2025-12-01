@@ -33,7 +33,7 @@ export type TechItem = {
 export type ChecklistItem = {
   id: string;
   task: string;
-  status: 'pending' | 'completed';
+  status: 'pending' | 'in-progress' | 'completed';
 };
 
 export type NextStepItem = {
@@ -51,6 +51,9 @@ interface AppState {
   techStack: TechItem[];
   mvpChecklist: ChecklistItem[];
   nextSteps: NextStepItem[];
+  tags: string[];
+  projectId: string | null;
+  graphData: any; // Store the hierarchical JSON structure
   
   isProcessing: boolean;
   insightsPanelOpen: boolean;
@@ -74,6 +77,9 @@ interface AppState {
   setTechStack: (stack: TechItem[]) => void;
   setMvpChecklist: (checklist: ChecklistItem[]) => void;
   setNextSteps: (steps: NextStepItem[]) => void;
+  setTags: (tags: string[]) => void;
+  setProjectId: (id: string) => void;
+  setGraphData: (data: any) => void;
   
   setIsProcessing: (isProcessing: boolean) => void;
   toggleInsightsPanel: () => void;
@@ -90,6 +96,9 @@ export const useStore = create<AppState>((set, get) => ({
   techStack: [],
   mvpChecklist: [],
   nextSteps: [],
+  tags: [],
+  projectId: null,
+  graphData: null,
   
   isProcessing: false,
   editingNodeId: null,
@@ -149,6 +158,9 @@ export const useStore = create<AppState>((set, get) => ({
   setTechStack: (techStack: TechItem[]) => set({ techStack }),
   setMvpChecklist: (mvpChecklist: ChecklistItem[]) => set({ mvpChecklist }),
   setNextSteps: (nextSteps: NextStepItem[]) => set({ nextSteps }),
+  setTags: (tags: string[]) => set({ tags }),
+  setProjectId: (id: string) => set({ projectId: id }),
+  setGraphData: (data: any) => set({ graphData: data }),
   
   setIsProcessing: (isProcessing: boolean) => set({ isProcessing }),
   toggleInsightsPanel: () => set({ insightsPanelOpen: !get().insightsPanelOpen }),
@@ -162,6 +174,8 @@ export const useStore = create<AppState>((set, get) => ({
     techStack: [],
     mvpChecklist: [],
     nextSteps: [],
+    tags: [],
+    graphData: null,
     isProcessing: false, 
     editingNodeId: null 
   }),

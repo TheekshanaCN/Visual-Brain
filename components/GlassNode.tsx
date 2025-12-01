@@ -9,6 +9,9 @@ export default function GlassNode({ data, selected, id }: NodeProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const { updateNodeLabel, editingNodeId, setEditingNodeId } = useStore();
 
+    // Determine node variant
+    const variant = data.variant as 'root' | 'branch' | 'child' || 'child';
+
     // Watch for editingNodeId changes from context menu
     useEffect(() => {
         if (editingNodeId === id) {
@@ -44,18 +47,31 @@ export default function GlassNode({ data, selected, id }: NodeProps) {
         }
     };
 
+    // Dynamic styles based on variant
+    const getVariantStyles = () => {
+        switch (variant) {
+            case 'root':
+                return 'min-w-[200px] py-4 px-6 text-lg font-bold bg-primary/20 border-primary/50 shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)]';
+            case 'branch':
+                return 'min-w-[160px] py-3 px-5 text-base font-semibold bg-secondary/30 border-secondary/50';
+            default: // child
+                return 'min-w-[140px] py-2 px-4 text-sm font-medium bg-card/60 border-border';
+        }
+    };
+
     return (
         <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className={`px-4 py-2 shadow-lg rounded-full border backdrop-blur-md transition-all duration-300 min-w-[150px] text-center
-        ${selected ? 'border-primary ring-2 ring-primary/20' : 'border-border'}
-        bg-card/60 text-card-foreground
+            className={`shadow-lg rounded-full border backdrop-blur-md transition-all duration-300 text-center relative
+        ${selected ? 'border-primary ring-2 ring-primary/20' : ''}
+        ${getVariantStyles()}
+        text-card-foreground
       `}
         >
             <Handle type="target" position={Position.Top} className="!bg-primary !w-3 !h-3" />
 
-            <div className="font-medium text-sm" onDoubleClick={handleDoubleClick}>
+            <div onDoubleClick={handleDoubleClick} className="w-full h-full flex items-center justify-center">
                 {isEditing ? (
                     <input
                         ref={inputRef}
@@ -64,10 +80,10 @@ export default function GlassNode({ data, selected, id }: NodeProps) {
                         onChange={(e) => setLabel(e.target.value)}
                         onBlur={handleSave}
                         onKeyDown={handleKeyDown}
-                        className="bg-transparent border-none outline-none text-center w-full"
+                        className="bg-transparent border-none outline-none text-center w-full font-inherit"
                     />
                 ) : (
-                    data.label as string
+                    <span className="pointer-events-none">{String(data.label)}</span>
                 )}
             </div>
 

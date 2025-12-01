@@ -79,16 +79,13 @@ export default function Dashboard() {
         }
     }, [isSignedIn]);
 
-    const handleCreateProject = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newProjectName.trim()) return;
-
+    const handleCreateProject = async () => {
         setCreating(true);
         try {
             const res = await fetch('/api/projects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newProjectName, description: newProjectDesc }),
+                body: JSON.stringify({ name: 'Untitled Project', description: '' }),
             });
 
             if (res.ok) {
@@ -165,55 +162,19 @@ export default function Dashboard() {
                         <h1 className="text-3xl font-bold mb-2 tracking-tight">My Projects</h1>
                         <p className="text-muted-foreground">Manage your Visual Brain sessions</p>
                     </div>
-                    <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-                        <DialogTrigger asChild>
-                            <Button size="lg" className="gap-2 shadow-lg shadow-primary/20">
-                                <Plus className="w-5 h-5" />
-                                New Project
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Create New Project</DialogTitle>
-                                <DialogDescription>
-                                    Start a new visual session to organize your thoughts.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={handleCreateProject}>
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="name">Project Name</Label>
-                                        <Input
-                                            id="name"
-                                            value={newProjectName}
-                                            onChange={(e) => setNewProjectName(e.target.value)}
-                                            placeholder="e.g., Marketing Strategy"
-                                            autoFocus
-                                        />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="description">Description (Optional)</Label>
-                                        <Textarea
-                                            id="description"
-                                            value={newProjectDesc}
-                                            onChange={(e) => setNewProjectDesc(e.target.value)}
-                                            placeholder="Brief description..."
-                                            className="resize-none"
-                                        />
-                                    </div>
-                                </div>
-                                <DialogFooter>
-                                    <Button type="submit" disabled={!newProjectName.trim() || creating}>
-                                        {creating ? (
-                                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                        ) : (
-                                            'Create Project'
-                                        )}
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                    <Button
+                        size="lg"
+                        className="gap-2 shadow-lg shadow-primary/20"
+                        onClick={handleCreateProject}
+                        disabled={creating}
+                    >
+                        {creating ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                            <Plus className="w-5 h-5" />
+                        )}
+                        New Project
+                    </Button>
                 </div>
 
                 {projects.length === 0 ? (
