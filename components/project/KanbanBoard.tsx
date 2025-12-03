@@ -64,61 +64,66 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
     // --- Render ---
 
     return (
-        <div className="flex flex-col h-full w-full">
+        <div className="flex flex-col w-full h-full">
             {/* Board Columns */}
-            <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar h-[350px]">
+            <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar flex-1">
                 {COLUMNS.map(col => (
                     <div
                         key={col.id}
-                        className="min-w-[180px] flex-1 flex flex-col gap-2 bg-muted/30 rounded-xl p-2 border border-border/50"
+                        className="flex-1 flex flex-col gap-2 bg-muted/30 rounded-xl p-2 border border-border/50 min-w-[250px]"
                     >
                         {/* Column Header */}
-                        <div className={cn("text-xs font-bold uppercase px-2 py-1 rounded-md w-fit tracking-wider", col.color)}>
+                        <div className={cn(
+                            "text-xs font-bold uppercase px-2 py-1 rounded-md w-fit tracking-wider",
+                            col.color
+                        )}>
                             {col.label}
                         </div>
 
                         {/* Column Items */}
                         <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2 p-0.5">
-                            {items.filter(item => item.status === col.id).map(item => (
-                                <div
-                                    key={item.id}
-                                    className="bg-background border border-border/60 p-3 rounded-lg shadow-sm text-xs group relative hover:border-primary/40 hover:shadow-md transition-all duration-200"
-                                >
-                                    <p className="pr-5 leading-relaxed">{item.task}</p>
-
-                                    {/* Delete Button */}
-                                    <button
-                                        onClick={() => handleDeleteItem(item.id)}
-                                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
-                                        aria-label="Delete task"
+                            {items
+                                .filter(item => item.status === col.id)
+                                .map(item => (
+                                    <div
+                                        key={item.id}
+                                        className="bg-background border border-border/60 p-3 rounded-lg shadow-sm text-xs group relative hover:border-primary/40 hover:shadow-md transition-all duration-200"
                                     >
-                                        <X className="w-3.5 h-3.5" />
-                                    </button>
+                                        <p className="pr-5 leading-relaxed">{item.task}</p>
 
-                                    {/* Move Controls */}
-                                    <div className="flex justify-between mt-3 opacity-0 group-hover:opacity-100 transition-opacity pt-2 border-t border-border/30">
-                                        {col.id !== 'pending' ? (
-                                            <button
-                                                onClick={() => handleMoveItem(item.id, col.id === 'completed' ? 'in-progress' : 'pending')}
-                                                className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
-                                                title="Move back"
-                                            >
-                                                <ArrowLeft className="w-3 h-3" />
-                                            </button>
-                                        ) : <div />}
+                                        {/* Delete Button */}
+                                        <button
+                                            onClick={() => handleDeleteItem(item.id)}
+                                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
+                                            aria-label="Delete task"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
 
-                                        {col.id !== 'completed' && (
-                                            <button
-                                                onClick={() => handleMoveItem(item.id, col.id === 'pending' ? 'in-progress' : 'completed')}
-                                                className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
-                                                title="Move forward"
-                                            >
-                                                <ArrowRight className="w-3 h-3" />
-                                            </button>
-                                        )}
+                                        {/* Move Controls */}
+                                        <div className="flex justify-between mt-3 opacity-0 group-hover:opacity-100 transition-opacity pt-2 border-t border-border/30">
+                                            {col.id !== 'pending' ? (
+                                                <button
+                                                    onClick={() => handleMoveItem(item.id, col.id === 'completed' ? 'in-progress' : 'pending')}
+                                                    className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                                                    title="Move back"
+                                                >
+                                                    <ArrowLeft className="w-3 h-3" />
+                                                </button>
+                                            ) : <div />}
+
+                                            {col.id !== 'completed' && (
+                                                <button
+                                                    onClick={() => handleMoveItem(item.id, col.id === 'pending' ? 'in-progress' : 'completed')}
+                                                    className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                                                    title="Move forward"
+                                                >
+                                                    <ArrowRight className="w-3 h-3" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
 
                             {items.filter(item => item.status === col.id).length === 0 && (
                                 <div className="h-20 flex items-center justify-center text-muted-foreground/30 text-[10px] italic border-2 border-dashed border-muted-foreground/10 rounded-lg">
@@ -162,4 +167,5 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
             </div>
         </div>
     );
+
 }

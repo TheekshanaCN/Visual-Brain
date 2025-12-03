@@ -65,7 +65,7 @@ interface AppState {
   onEdgesChange: OnEdgesChange;
   onConnect: (connection: Connection) => void;
   
-  setNodes: (nodes: Node[]) => void;
+  setNodes: (nodes: Node[] | ((prevNodes: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[]) => void;
   addNode: (node: Node) => void;
   addManualNode: (position: { x: number; y: number }, label?: string) => void;
@@ -108,7 +108,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   onNodesChange: (changes: NodeChange[]) => {
     set({
-      nodes: applyNodeChanges(changes, get().nodes),
+      nodes: applyNodeChanges(changes, get().nodes || []),
     });
   },
   onEdgesChange: (changes: EdgeChange[]) => {
@@ -122,9 +122,12 @@ export const useStore = create<AppState>((set, get) => ({
     });
   },
 
-  setNodes: (nodes: Node[]) => set({ nodes }),
+  setNodes: (nodes: Node[] | ((prevNodes: Node[]) => Node[])) => {
+    const newNodes = typeof nodes === 'function' ? nodes(get().nodes || []) : nodes;
+    set({ nodes: newNodes });
+  },
   setEdges: (edges: Edge[]) => set({ edges }),
-  addNode: (node: Node) => set({ nodes: [...get().nodes, node] }),
+  addNode: (node: Node) => set({ nodes: [...(get().nodes || []), node] }),
   
   addManualNode: (position: { x: number; y: number }, label?: string) => {
     const newNode: Node = {
@@ -133,17 +136,17 @@ export const useStore = create<AppState>((set, get) => ({
       position,
       data: { label: label || 'New Node' },
     };
-    set({ nodes: [...get().nodes, newNode] });
+    set({ nodes: [...(get().nodes || []), newNode] });
   },
   
   deleteNode: (nodeId: string) => {
-    const nodes = get().nodes.filter(node => node.id !== nodeId);
+    const nodes = (get().nodes || []).filter(node => node.id !== nodeId);
     const edges = get().edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId);
     set({ nodes, edges });
   },
   
   updateNodeLabel: (nodeId: string, label: string) => {
-    const nodes = get().nodes.map(node => 
+    const nodes = (get().nodes || []).map(node => 
       node.id === nodeId 
         ? { ...node, data: { ...node.data, label } }
         : node

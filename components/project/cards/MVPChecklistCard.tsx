@@ -26,11 +26,11 @@ export default function MVPChecklistCard({ checklist, onGenerate, isGenerating }
     return (
         <ProjectCard
             title="MVP Checklist"
-            icon={<CheckSquare className="w-4 h-4" />}
+            icon={<CheckSquare className="w-8 h-4" />}
             onGenerate={onGenerate}
             isGenerating={isGenerating}
             hasData={checklist.length > 0}
-            className="h-full"
+            className="h-full w-full"
         >
             <div className="space-y-2">
                 {checklist.map((item, i) => {

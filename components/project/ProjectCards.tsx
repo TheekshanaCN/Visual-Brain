@@ -24,19 +24,46 @@ export default function ProjectCards() {
 
     // Add card nodes to the ReactFlow canvas when data exists
     useEffect(() => {
-        if (nodes.length === 0) return;
+        // Helper to create or update a card node
+        const createOrUpdateCard = (
+            id: string,
+            position: { x: number; y: number },
+            data: Partial<CardNodeData>,
+            defaultStyle?: React.CSSProperties
+        ) => {
+            const existingNode = nodes.find(n => n.id === id);
 
-        // Check if card nodes already exist
-        const hasCardNodes = nodes.some(n => n.type === 'card');
-        if (hasCardNodes) return;
+            if (existingNode) {
+                // Update existing node data but keep position and dimensions
+                return {
+                    ...existingNode,
+                    data: {
+                        ...existingNode.data,
+                        ...data
+                    }
+                };
+            } else {
+                // Create new node
+                return {
+                    id,
+                    type: 'card',
+                    position,
+                    data,
+                    draggable: true,
+                    style: defaultStyle,
+                };
+            }
+        };
 
-        // Define card nodes positioned around the visual map
-        const cardNodes = [
-            // AI Insights - Top Left
+        const newNodes = [...nodes];
+        let hasChanges = false;
+
+        // Define card definitions
+        const cardDefinitions = [
             {
                 id: 'card-insights',
-                type: 'card',
                 position: { x: -600, y: -400 },
+                defaultStyle: { width: 340, height: 400 },
                 data: {
                     title: 'AI Insights',
                     icon: <Lightbulb className="w-4 h-4" />,
@@ -67,21 +94,18 @@ export default function ProjectCards() {
                             </div>
                         </div>
                     ) : null
-                } as CardNodeData,
-                draggable: true,
+                }
             },
-            // Tech Stack - Top Right
             {
                 id: 'card-tech',
-                type: 'card',
                 position: { x: 1200, y: -400 },
+                defaultStyle: { width: 340, height: 400 },
                 data: {
                     title: 'Tech Stack',
                     icon: <Code className="w-4 h-4" />,
                     hasData: techStack.length > 0,
-                    isGenerating: false, // Initial state, will be managed via node updates
+                    isGenerating: false,
                     onGenerate: async () => {
-                        // 1. Set loading state
                         const updateNodeLoading = (isLoading: boolean) => {
                             setNodes(useStore.getState().nodes.map(n =>
                                 n.id === 'card-tech'
@@ -132,14 +156,12 @@ export default function ProjectCards() {
                             ))}
                         </div>
                     ) : null
-                } as CardNodeData,
-                draggable: true,
+                }
             },
-            // MVP Checklist - Bottom Left
             {
                 id: 'card-mvp',
-                type: 'card',
                 position: { x: -600, y: 800 },
+                defaultStyle: { width: 800, height: 500 },
                 data: {
                     title: 'MVP Checklist',
                     icon: <CheckSquare className="w-4 h-4" />,
@@ -173,9 +195,7 @@ export default function ProjectCards() {
 
                             const data = await res.json();
 
-                            // Transform API response (Kanban) to ChecklistItem[]
                             const newChecklist: any[] = [];
-
                             if (data.todo) {
                                 data.todo.forEach((task: string, i: number) =>
                                     newChecklist.push({ id: `todo-${i}`, task, status: 'pending' })
@@ -206,14 +226,12 @@ export default function ProjectCards() {
                             onUpdate={setMvpChecklist}
                         />
                     ) : null
-                } as CardNodeData,
-                draggable: true,
+                }
             },
-            // Next Steps - Bottom Right
             {
                 id: 'card-next',
-                type: 'card',
                 position: { x: 1200, y: 800 },
+                defaultStyle: { width: 340, height: 400 },
                 data: {
                     title: 'Next Steps',
                     icon: <ArrowRight className="w-4 h-4" />,
@@ -231,14 +249,50 @@ export default function ProjectCards() {
                             onUpdate={setNextSteps}
                         />
                     ) : null
-                } as CardNodeData,
-                draggable: true,
-            },
+                }
+            }
         ];
 
-        // Add card nodes to the existing nodes
-        setNodes([...nodes, ...cardNodes]);
-    }, [nodes.length, insight, techStack, mvpChecklist, nextSteps]);
+        // Use functional update to access latest nodes without adding 'nodes' to dependency array
+        setNodes((currentNodes) => {
+            const newNodes = [...currentNodes];
+            let hasChanges = false;
+
+            cardDefinitions.forEach(def => {
+                const existingIndex = newNodes.findIndex(n => n.id === def.id);
+                // We need to pass the current nodes to createOrUpdateCard logic, 
+                // but createOrUpdateCard currently uses 'nodes' from closure which is stale.
+                // Let's inline the logic or pass currentNodes.
+
+                if (existingIndex !== -1) {
+                    const existingNode = newNodes[existingIndex];
+                    // Merge data
+                    newNodes[existingIndex] = {
+                        ...existingNode,
+                        data: {
+                            ...existingNode.data,
+                            ...def.data
+                        }
+                    };
+                    // We assume data changed because dependencies (insight, etc) changed
+                    hasChanges = true;
+                } else {
+                    newNodes.push({
+                        id: def.id,
+                        type: 'card',
+                        position: def.position,
+                        data: def.data,
+                        draggable: true,
+                        style: def.defaultStyle,
+                    } as any);
+                    hasChanges = true;
+                }
+            });
+
+            return hasChanges ? newNodes : currentNodes;
+        });
+
+    }, [insight, techStack, mvpChecklist, nextSteps, setNodes]);
 
     // This component doesn't render anything - it just manages card nodes
     return null;

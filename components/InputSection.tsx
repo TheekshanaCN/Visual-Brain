@@ -75,6 +75,18 @@ export default function InputSection() {
         const centerX = 0;
         const centerY = 0;
 
+        // Vibrant color palette for main branches
+        const colors = [
+          '#10b981', // Emerald
+          '#3b82f6', // Blue
+          '#8b5cf6', // Violet
+          '#f59e0b', // Amber
+          '#ec4899', // Pink
+          '#06b6d4', // Cyan
+          '#f43f5e', // Rose
+          '#84cc16', // Lime
+        ];
+
         // 1. Create Root Node
         const rootId = 'root';
         newNodes.push({
@@ -86,18 +98,19 @@ export default function InputSection() {
 
         // 2. Create Main Branches (Radial Layout)
         const branches = data.root.branches;
-        const branchRadius = 400; // Distance from root
+        const branchRadius = 600; // Increased from 400 for better spread
 
         branches.forEach((branch: any, index: number) => {
           const angle = (index / branches.length) * 2 * Math.PI - Math.PI / 2; // Start from top
           const branchX = centerX + branchRadius * Math.cos(angle);
           const branchY = centerY + branchRadius * Math.sin(angle);
           const branchId = `branch-${index}`;
+          const branchColor = colors[index % colors.length];
 
           newNodes.push({
             id: branchId,
             position: { x: branchX, y: branchY },
-            data: { label: branch.label, variant: 'branch' },
+            data: { label: branch.label, variant: 'branch', color: branchColor },
             type: 'glass',
           });
 
@@ -107,12 +120,12 @@ export default function InputSection() {
             source: rootId,
             target: branchId,
             animated: true,
-            style: { stroke: 'var(--primary)', strokeWidth: 2 },
+            style: { stroke: branchColor, strokeWidth: 3 },
           });
 
           // 3. Create Child Nodes (Cluster around Branch)
           const children = branch.children;
-          const childRadius = 150; // Distance from branch node
+          const childRadius = 250; // Increased from 150 for better clustering
           const startAngle = angle - Math.PI / 3; // Spread children in a fan shape
           const totalSpread = (Math.PI * 2) / 3; // 120 degrees spread
 
@@ -128,7 +141,7 @@ export default function InputSection() {
             newNodes.push({
               id: childId,
               position: { x: childX, y: childY },
-              data: { label: child, variant: 'child' },
+              data: { label: child, variant: 'child', color: branchColor }, // Inherit color
               type: 'glass',
             });
 
@@ -138,7 +151,7 @@ export default function InputSection() {
               source: branchId,
               target: childId,
               animated: false,
-              style: { stroke: 'var(--muted-foreground)', opacity: 0.5 },
+              style: { stroke: branchColor, opacity: 0.5, strokeWidth: 1.5 },
             });
           });
         });

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { UserButton, useUser } from '@clerk/nextjs';
-import { Brain, Moon, Sun, Pencil, Check, X, Sparkles } from 'lucide-react';
+import { Brain, Moon, Sun, Pencil, Check, X, Sparkles, MessageSquare, ArrowLeft } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +13,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface NavbarProps {
     projectId?: string;
@@ -28,6 +31,11 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
     const [isEditing, setIsEditing] = useState(false);
     const [editedName, setEditedName] = useState(projectName || '');
     const [isSaving, setIsSaving] = useState(false);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [feedbackCategory, setFeedbackCategory] = useState<string>('');
+    const [feedbackText, setFeedbackText] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -76,18 +84,75 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
         }
     };
 
-    return (
-        <header className="fixed top-0 left-0 w-full bg-background/60 backdrop-blur-md z-50">
-            <div className="w-full max-w-8xl mx-auto px-6 flex items-center justify-between h-[46px]">
+    const handleFeedbackSubmit = async () => {
+        if (!feedbackCategory || !feedbackText.trim()) return;
 
-                <div className="flex items-center gap-4">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="p-1.5 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                            <Brain className="w-4 h-4 text-primary" />
+        setIsSubmitting(true);
+
+        try {
+            const res = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category: feedbackCategory,
+                    feedback: feedbackText,
+                    projectId: projectId || null
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to submit feedback');
+            }
+
+            setShowSuccess(true);
+
+            setTimeout(() => {
+                setShowSuccess(false);
+                setShowFeedbackModal(false);
+                setFeedbackCategory('');
+                setFeedbackText('');
+            }, 2000);
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const feedbackCategories = [
+        { id: 'feature', label: '✨ Feature Request', icon: '✨' },
+        { id: 'bug', label: '🐛 Bug Report', icon: '🐛' },
+        { id: 'improvement', label: '🚀 Improvement', icon: '🚀' },
+        { id: 'question', label: '❓ Question', icon: '❓' },
+        { id: 'other', label: '💬 Other', icon: '💬' }
+    ];
+
+    return (
+        <header className="fixed top-0 left-0 w-full bg-[#C9B59C] backdrop-blur-md z-50">
+            <div className="w-full max-w-8xl mx-auto px-2 flex items-center justify-between h-[46px]">
+
+                <div className="flex items-center">
+                    <Link href="/dashboard" className="group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-md font-medium">
+
+                        {/* Default (top) view */}
+                        <div className="inline-flex h-10 translate-y-0 items-center justify-center px-2 text-neutral-950 transition duration-500 group-hover:-translate-y-[150%]">
+                            <div className="p-1.5 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                                <Brain className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-sm font-bold bg-clip-text text-transparent bg-white">
+                                Visual Brain
+                            </span>
                         </div>
-                        <span className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-                            Visual Brain
-                        </span>
+
+                        {/* Hover (bottom) view */}
+                        <div className="absolute inline-flex h-3 w-full translate-y-[100%] items-center justify-center text-[#c9b59c] transition duration-500 group-hover:translate-y-0">
+                            <span className="absolute h-full w-full translate-y-full skew-y-12 scale-y-0 bg-white transition duration-500 group-hover:translate-y-0 group-hover:scale-150"></span>
+
+                            <div className="z-10 p-1.5 bg-white/10 rounded-lg">
+                                <ArrowLeft className="w-4 h-4 text-[#c9b59c]" />
+                            </div>
+                            <span className="z-10 font-bold">Back</span>
+                        </div>
                     </Link>
 
                     {/* Tags Display */}
@@ -156,6 +221,16 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
                 )}
 
                 <div className="flex items-center gap-3">
+                    <Button
+                        variant="default"
+                        size="sm"
+                        className="gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg shadow-emerald-500/20 h-8 px-4"
+                        onClick={() => setShowFeedbackModal(true)}
+                    >
+                        <MessageSquare className="w-4 h-4" />
+                        <span className="text-sm font-medium">Feedback</span>
+                    </Button>
+
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
@@ -170,30 +245,107 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    {isSignedIn ? (
-                        <>
-                            <Link href="/dashboard">
-                                <Button variant="ghost" className="px-4 h-8 text-sm">
-                                    Dashboard
-                                </Button>
-                            </Link>
-                            <UserButton appearance={{ elements: { avatarBox: 'w-8 h-8' } }} />
-                        </>
-                    ) : (
-                        <>
-                            <Link href="/sign-in">
-                                <Button variant="ghost" className="text-sm px-3 h-8">Sign In</Button>
-                            </Link>
-                            <Link href="/sign-up">
-                                <Button className="text-sm px-4 h-8 bg-blue-600 hover:bg-blue-500 text-white">
-                                    Get Started
-                                </Button>
-                            </Link>
-                        </>
-                    )}
+
+                    <UserButton appearance={{ elements: { avatarBox: 'w-8 h-8' } }} />
+
                 </div>
 
             </div>
+
+            <Dialog open={showFeedbackModal} onOpenChange={setShowFeedbackModal}>
+                <DialogContent className="sm:max-w-[500px]">
+                    {showSuccess ? (
+                        <div className="flex flex-col items-center justify-center py-8">
+                            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+                                <Check className="w-8 h-8 text-green-500" />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2">Thank You! 🎉</h3>
+                            <p className="text-muted-foreground text-center">
+                                Your feedback has been received. We appreciate your input!
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                    <MessageSquare className="w-5 h-5 text-primary" />
+                                    Share Your Feedback
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Help us improve Visual Brain by sharing your thoughts, ideas, or reporting issues.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">What type of feedback?</Label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {feedbackCategories.map((category) => (
+                                            <button
+                                                key={category.id}
+                                                onClick={() => setFeedbackCategory(category.id)}
+                                                className={`p-3 rounded-lg border-2 transition-all text-left ${feedbackCategory === category.id
+                                                    ? 'border-primary bg-primary/5 shadow-sm'
+                                                    : 'border-border hover:border-primary/50 hover:bg-accent'
+                                                    }`}
+                                            >
+                                                <div className="text-sm font-medium">{category.label}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {feedbackCategory && (
+                                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <Label htmlFor="feedback" className="text-sm font-medium">
+                                            Tell us more
+                                        </Label>
+                                        <Textarea
+                                            id="feedback"
+                                            placeholder="Share your thoughts, ideas, or describe the issue..."
+                                            value={feedbackText}
+                                            onChange={(e) => setFeedbackText(e.target.value)}
+                                            className="min-h-[120px] resize-none"
+                                            autoFocus
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setShowFeedbackModal(false);
+                                        setFeedbackCategory('');
+                                        setFeedbackText('');
+                                    }}
+                                    disabled={isSubmitting}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={handleFeedbackSubmit}
+                                    disabled={!feedbackCategory || !feedbackText.trim() || isSubmitting}
+                                    className="gap-2"
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Sending...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Check className="w-4 h-4" />
+                                            Submit Feedback
+                                        </>
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
         </header>
     );
 }

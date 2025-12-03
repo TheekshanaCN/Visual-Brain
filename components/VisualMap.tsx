@@ -24,7 +24,7 @@ export default function VisualMap() {
   }, []);
 
   // Handle right-click on canvas
-  const handlePaneContextMenu = useCallback((event: React.MouseEvent) => {
+  const handlePaneContextMenu = useCallback((event: React.MouseEvent | MouseEvent) => {
     event.preventDefault();
     setContextMenu({
       x: event.clientX,
@@ -106,7 +106,7 @@ export default function VisualMap() {
   return (
     <div className="w-full h-full bg-background transition-colors duration-300">
       <ReactFlow
-        nodes={nodes}
+        nodes={nodes ?? []}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

@@ -42,15 +42,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   };
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-background text-foreground selection:bg-primary/30 transition-colors duration-300 pt-[46px] pb-2 px-2">
+    <main className="relative w-screen h-screen overflow-hidden bg-[#C9B59C] text-foreground selection:bg-primary/30 transition-colors duration-300 pt-[46px] pb-2 px-2">
       <ProjectInitializer project={serializedProject as any} />
 
-      {/* Enhanced Background Gradients */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
-      </div>
 
       <ProjectNavbarWrapper projectId={serializedProject._id} initialProjectName={serializedProject.name} />
 
