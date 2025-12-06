@@ -12,11 +12,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { AuthModal } from '@/components/AuthModal';
+import { getClerkAppearance } from '@/lib/clerk-appearance';
 import { useEffect, useState } from 'react';
 
 export default function Navbar() {
     const { isSignedIn } = useUser();
-    const { setTheme } = useTheme();
+    const { setTheme, theme } = useTheme();
+    const isDark = theme === 'dark';
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -30,8 +33,8 @@ export default function Navbar() {
     return (
         <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-background/80 backdrop-blur-md border-b border-border py-3 shadow-sm'
-                    : 'bg-transparent py-5'
+                ? 'bg-background/80 backdrop-blur-md border-b border-border py-3 shadow-sm'
+                : 'bg-transparent py-5'
                 }`}
         >
             <div className="container mx-auto px-6 flex items-center justify-between">
@@ -39,7 +42,7 @@ export default function Navbar() {
                     <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
                         <Brain className="w-6 h-6 text-primary" />
                     </div>
-                    <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+                    <span className="text-xl font-bold text-foreground">
                         Visual Brain
                     </span>
                 </Link>
@@ -73,23 +76,25 @@ export default function Navbar() {
                                 <Button variant="ghost">Dashboard</Button>
                             </Link>
                             <UserButton
-                                appearance={{
-                                    elements: {
-                                        avatarBox: 'w-10 h-10',
-                                    },
-                                }}
+                                appearance={getClerkAppearance(isDark)}
                             />
                         </>
                     ) : (
                         <>
-                            <Link href="/sign-in">
-                                <Button variant="ghost">Sign In</Button>
-                            </Link>
-                            <Link href="/sign-up">
-                                <Button className="bg-blue-600 hover:bg-blue-500 text-white">
-                                    Get Started
-                                </Button>
-                            </Link>
+                            <>
+                                <AuthModal
+                                    mode="sign-in"
+                                    trigger={<Button variant="ghost">Sign In</Button>}
+                                />
+                                <AuthModal
+                                    mode="sign-up"
+                                    trigger={
+                                        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                            Get Started
+                                        </Button>
+                                    }
+                                />
+                            </>
                         </>
                     )}
                 </div>
@@ -133,21 +138,29 @@ export default function Navbar() {
                                             </Button>
                                         </Link>
                                         <div className="flex justify-start px-4">
-                                            <UserButton />
+                                            <UserButton appearance={getClerkAppearance(isDark)} />
                                         </div>
                                     </>
                                 ) : (
                                     <>
-                                        <Link href="/sign-in">
-                                            <Button variant="ghost" className="w-full justify-start">
-                                                Sign In
-                                            </Button>
-                                        </Link>
-                                        <Link href="/sign-up">
-                                            <Button className="w-full bg-blue-600 hover:bg-blue-500">
-                                                Get Started
-                                            </Button>
-                                        </Link>
+                                        <>
+                                            <AuthModal
+                                                mode="sign-in"
+                                                trigger={
+                                                    <Button variant="ghost" className="w-full justify-start">
+                                                        Sign In
+                                                    </Button>
+                                                }
+                                            />
+                                            <AuthModal
+                                                mode="sign-up"
+                                                trigger={
+                                                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                                                        Get Started
+                                                    </Button>
+                                                }
+                                            />
+                                        </>
                                     </>
                                 )}
                             </div>

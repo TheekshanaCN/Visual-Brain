@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { UserButton, useUser } from '@clerk/nextjs';
 import { Brain, Moon, Sun, Pencil, Check, X, Sparkles, MessageSquare, ArrowLeft } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { getClerkAppearance } from '@/lib/clerk-appearance';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -26,7 +27,8 @@ interface NavbarProps {
 
 export default function Navbar({ projectId, projectName, onProjectNameUpdate, tags }: NavbarProps) {
     const { isSignedIn } = useUser();
-    const { setTheme } = useTheme();
+    const { setTheme, theme } = useTheme();
+    const isDark = theme === 'dark';
     const [scrolled, setScrolled] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedName, setEditedName] = useState(projectName || '');
@@ -204,7 +206,7 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
                             </div>
                         ) : (
                             <div className="flex items-center gap-2 group/title">
-                                <h1 className="text-sm font-semibold text-foreground">
+                                <h1 className="text-sm font-bold text-background">
                                     {projectName}
                                 </h1>
                                 <Button
@@ -213,7 +215,7 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
                                     className="h-7 w-7 opacity-0 group-hover/title:opacity-100 transition-opacity"
                                     onClick={() => setIsEditing(true)}
                                 >
-                                    <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                                    <Pencil className="w-3.5 h-3.5 text-muted-background" />
                                 </Button>
                             </div>
                         )}
@@ -224,12 +226,23 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
                     <Button
                         variant="default"
                         size="sm"
-                        className="gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg shadow-emerald-500/20 h-8 px-4"
                         onClick={() => setShowFeedbackModal(true)}
+                        className="
+        gap-2 h-8 px-4
+        bg-forground text-background border border-border
+        shadow-lg
+        overflow-hidden relative inline-flex items-center justify-center
+        transition-all duration-100
+        [box-shadow:5px_5px_rgb(82_82_82)]
+        active:translate-x-[3px] active:translate-y-[3px]
+        active:[box-shadow:0px_0px_rgb(82_82_82)]
+        cursor-pointer
+    "
                     >
                         <MessageSquare className="w-4 h-4" />
                         <span className="text-sm font-medium">Feedback</span>
                     </Button>
+
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -246,7 +259,7 @@ export default function Navbar({ projectId, projectName, onProjectNameUpdate, ta
                     </DropdownMenu>
 
 
-                    <UserButton appearance={{ elements: { avatarBox: 'w-8 h-8' } }} />
+                    <UserButton appearance={getClerkAppearance(isDark)} />
 
                 </div>
 

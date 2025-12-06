@@ -32,10 +32,10 @@ export default function NavigationDock() {
     const navItems = [
         { id: 'all', label: 'Show All', icon: Compass, action: showAll },
         { id: 'map', label: 'Map', icon: Map, action: zoomToMap },
-        { id: 'card-insights', label: 'Insights', icon: Lightbulb, action: () => zoomToNode('card-insights') },
-        { id: 'card-tech', label: 'Tech', icon: Code, action: () => zoomToNode('card-tech') },
+        { id: 'card-insights', label: 'AI Insights', icon: Lightbulb, action: () => zoomToNode('card-insights') },
+        { id: 'card-tech', label: 'Tech Stack', icon: Code, action: () => zoomToNode('card-tech') },
         { id: 'card-mvp', label: 'MVP', icon: CheckSquare, action: () => zoomToNode('card-mvp') },
-        { id: 'card-next', label: 'Next', icon: ArrowRight, action: () => zoomToNode('card-next') },
+        { id: 'card-next', label: 'Next Steps', icon: ArrowRight, action: () => zoomToNode('card-next') },
     ];
 
     return (
