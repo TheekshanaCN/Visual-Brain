@@ -6,15 +6,16 @@ import SideToolbar from '@/components/SideToolbar'
 import FlowProvider from '@/components/FlowProvider'
 import ProjectNavbarWrapper from '@/components/newboard/ProjectNavbarWrapper'
 import NavigationDock from '@/components/project/NavigationDock'
-import VisualMap from '@/components/VisualMap';
+import VisualMap from '@/components/newboard/VisualMap';
+import OnboardingCards from '@/components/OnboardingCards';
 
 export default function ProjectPage() {
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-[#C9B59C] text-foreground selection:bg-primary/30 transition-colors duration-300 pt-[46px] pb-2 px-2">
-      
-      <ProjectNavbarWrapper 
-        projectId="ssssss" 
-        initialProjectName="untitle" 
+
+      <ProjectNavbarWrapper
+        projectId="ssssss"
+        initialProjectName="untitle"
       />
 
       <div className="h-full relative">
@@ -24,6 +25,7 @@ export default function ProjectPage() {
             <NavigationDock />
             <InputSection />
             <SideToolbar />
+            <OnboardingCards />
           </FlowProvider>
         </div>
       </div>

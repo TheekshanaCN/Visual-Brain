@@ -12,6 +12,7 @@ import FlowProvider from '@/components/FlowProvider';
 import ProjectNavbarWrapper from '@/components/project/ProjectNavbarWrapper';
 import ProjectCards from '@/components/project/ProjectCards';
 import NavigationDock from '@/components/project/NavigationDock';
+import OnboardingCards from '@/components/OnboardingCards';
 
 interface ProjectPageProps {
   params: Promise<{ id: string }>;
@@ -57,6 +58,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <NavigationDock />
             <InputSection />
             <SideToolbar />
+            <OnboardingCards />
           </FlowProvider>
         </div>
       </div>
