@@ -15,7 +15,7 @@ export default function SideToolbar() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
+        setMounted(true); 
     }, []);
 
     const handleExport = async () => {

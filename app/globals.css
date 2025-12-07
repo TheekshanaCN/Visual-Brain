@@ -159,7 +159,7 @@
   --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 6px);
-  
+
   /* Additional calm UI variables */
   --animate-fade-in: fade-in 0.3s ease-out;
   --animate-slide-up: slide-up 0.4s ease-out;
@@ -275,7 +275,6 @@ body {
   box-shadow: 0 4px 12px rgba(201, 181, 156, 0.3);
 }
 
-
 /* Custom animations */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(10px); }
@@ -318,7 +317,7 @@ body {
     @apply bg-background text-foreground;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
-  
+
   /* Warm selection colors */
   ::selection {
     background-color: rgba(201, 181, 156, 0.4);
@@ -327,12 +326,12 @@ body {
   .dark ::selection {
     background-color: rgba(212, 185, 153, 0.4);
   }
-  
+
   /* Smoother transitions for theme changes */
   input, button, textarea, select {
     transition: background-color 0.2s ease;
   }
-  
+
   /* Warm link colors */
   a {
     color: var(--primary);
@@ -344,5 +343,14 @@ body {
   }
   .dark a:hover {
     color: color-mix(in srgb, var(--primary) 120%, #fff 20%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
