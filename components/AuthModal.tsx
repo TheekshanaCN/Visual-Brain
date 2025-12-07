@@ -1,38 +1,54 @@
-'use client';
+"use client";
 
 import { SignIn, SignUp } from "@clerk/nextjs";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useTheme } from "next-themes";
 import { getClerkAppearance } from "@/lib/clerk-appearance";
 
 interface AuthModalProps {
-    trigger: React.ReactNode;
-    mode: "sign-in" | "sign-up";
+  trigger: React.ReactNode;
+  mode: "sign-in" | "sign-up";
 }
 
 export function AuthModal({ trigger, mode }: AuthModalProps) {
-    const { theme } = useTheme();
-    const isDark = theme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
-    return (
-        <Dialog>
-            <DialogTrigger asChild>{trigger}</DialogTrigger>
+  return (
+    <Dialog>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
 
-            <DialogContent className="sm:max-w-[480px] p-0 bg-transparent border-none flex justify-center items-center">
-                <DialogTitle className="sr-only">
-                    {mode === "sign-in" ? "Sign In" : "Sign Up"}
-                </DialogTitle>
+      <DialogContent className="max-w-md p-0 gap-0 border-0 bg-transparent shadow-none overflow-visible">
+        <VisuallyHidden>
+          <DialogTitle>
+            {mode === "sign-in" ? "Sign In" : "Sign Up"}
+          </DialogTitle>
+        </VisuallyHidden>
 
-                {/* Custom Styled Clerk Form */}
-                <div className="w-full px-6 py-8 
-                        bg-white dark:bg-[#24211E]">
-                    {mode === "sign-in" ? (
-                        <SignIn appearance={getClerkAppearance(isDark)} routing="hash" />
-                    ) : (
-                        <SignUp appearance={getClerkAppearance(isDark)} routing="hash" />
-                    )}
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
+        {/* Clerk Form Container */}
+        <div className="relative rounded-lg border bg-card p-6 pb-12 shadow-lg">
+          {/* Title Section */}
+          <div className="relative z-10 -mb-6 flex flex-col items-center">
+            <h2 className="mt-3 text-2xl font-bold tracking-tight mb-16">
+              Your Unicorn Awaits
+            </h2>
+          </div>
+
+          <div className="flex items-center justify-center">
+            {mode === "sign-in" ? (
+              <SignIn appearance={getClerkAppearance(isDark)} routing="hash" />
+            ) : (
+              <SignUp appearance={getClerkAppearance(isDark)} routing="hash" />
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

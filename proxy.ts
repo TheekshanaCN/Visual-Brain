@@ -13,6 +13,7 @@ const isPublicRoute = createRouteMatcher([
 // Define protected routes (require authentication)
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
+  '/projects(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -32,7 +33,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Protect dashboard routes - redirect to sign-in if not authenticated
   if (isProtectedRoute(req) && !isSignedIn) {
-    return NextResponse.redirect(new URL('/sign-in', req.url));
+    return NextResponse.redirect(new URL('/newboard', req.url));
   }
 
   // If user is signed in and tries to access sign-in/sign-up, redirect to dashboard
