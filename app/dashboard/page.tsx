@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
 import { Plus, Calendar, ArrowRight, Loader2, FolderOpen, Trash2, MoreVertical, Pencil } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
+import { getCurrentUser } from '@/app/actions/auth';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,8 +38,11 @@ interface Project {
 }
 
 export default function Dashboard() {
-    const { isLoaded, isSignedIn } = useUser();
     const router = useRouter();
+    // Replaced Clerk hooks with custom state/effect
+    const [user, setUser] = useState<any>(null);
+    const [authLoading, setAuthLoading] = useState(true);
+
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
@@ -54,10 +57,23 @@ export default function Dashboard() {
     const [updating, setUpdating] = useState(false);
 
     useEffect(() => {
-        if (isLoaded && !isSignedIn) {
-            router.push('/sign-in');
+        async function checkAuth() {
+            try {
+                const u = await getCurrentUser();
+                if (!u) {
+                    router.push('/'); // OR WorkOS Sign In
+                } else {
+                    setUser(u);
+                }
+            } catch (error) {
+                console.error("Auth check failed", error);
+            } finally {
+                setAuthLoading(false);
+            }
         }
-    }, [isLoaded, isSignedIn, router]);
+        checkAuth();
+    }, [router]);
+
 
     useEffect(() => {
         async function fetchProjects() {
@@ -74,10 +90,10 @@ export default function Dashboard() {
             }
         }
 
-        if (isSignedIn) {
+        if (user) {
             fetchProjects();
         }
-    }, [isSignedIn]);
+    }, [user]);
 
     const handleCreateProject = async () => {
         setCreating(true);
@@ -144,7 +160,7 @@ export default function Dashboard() {
         }
     };
 
-    if (!isLoaded || loading) {
+    if (authLoading || (loading && user)) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />

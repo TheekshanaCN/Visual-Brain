@@ -1,5 +1,5 @@
 'use client';
-import { ReactFlow, Background } from '@xyflow/react';
+import { ReactFlow, Background, BackgroundVariant } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
@@ -27,7 +27,7 @@ export default function VisualMap() {
 
   return (
     <>
-      <div 
+      <div
         className="w-full h-full bg-background"
         onContextMenu={handleContextMenu}
       >
@@ -41,16 +41,16 @@ export default function VisualMap() {
           fitView
         >
           <Background
-            color={isDark ? '#333' : '#e5e7eb'}
+            color={isDark ? '#5c5040' : '#d4c9b8'}
             gap={20}
-            variant="dots" // Options: 'dots', 'lines', 'cross'
+            variant={BackgroundVariant.Dots}
           />
         </ReactFlow>
       </div>
 
       {/* Hidden Auth Modal */}
-      <AuthModal 
-        trigger={<button ref={authTriggerRef} className="hidden" />} 
+      <AuthModal
+        trigger={<button ref={authTriggerRef} className="hidden" />}
         mode="sign-in"
       />
     </>

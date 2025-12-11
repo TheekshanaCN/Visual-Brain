@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { withAuth } from '@workos-inc/authkit-nextjs';
 import connectToDatabase from '@/lib/db';
 import Project from '@/models/Project';
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const { user } = await withAuth();
+    if (!user) {
       console.log('POST /api/projects: Unauthorized');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = user.id;
 
     await connectToDatabase();
     const { name, description } = await req.json();
@@ -37,10 +38,11 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const { user } = await withAuth();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = user.id;
 
     await connectToDatabase();
     const projects = await Project.find({ userId }).sort({ updatedAt: -1 });

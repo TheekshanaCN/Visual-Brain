@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
@@ -13,6 +13,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: "400",
+  style: "normal",
+});
+
 export const metadata: Metadata = {
   title: "Visual Brain",
   description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps. By Theekshana.",
@@ -23,7 +30,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { ClerkProvider } from '@clerk/nextjs';
+import { AuthKitProvider } from '@workos-inc/authkit-nextjs/components';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from "@/components/theme-provider"
 
@@ -33,14 +40,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <AuthKitProvider>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased`}
         >
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
@@ -50,6 +57,6 @@ export default function RootLayout({
           </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
+    </AuthKitProvider>
   );
 }

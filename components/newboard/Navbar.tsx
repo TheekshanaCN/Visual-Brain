@@ -6,8 +6,21 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import { Facebook, Twitter, Instagram } from "lucide-react";
 import { AuthModal } from '@/components/AuthModal';
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
-export default function Navbar() {
+interface NavbarProps {
+  projectId?: string;
+  projectName?: string;
+  onProjectNameUpdate?: (newName: string) => void;
+  tags?: string[];
+}
+
+export default function Navbar({
+  projectId,
+  projectName,
+  onProjectNameUpdate,
+  tags,
+}: NavbarProps) {
   useEffect(() => {
     const handleScroll = () => {
       // Handle scroll logic if needed in the future
@@ -17,24 +30,17 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-[#C9B59C] backdrop-blur-md z-50">
+    <header className="sticky top-0 w-full bg-background/60 backdrop-blur-md z-40 shrink-0 border-b border-border/40">
       <div className="w-full max-w-8xl mx-auto px-2 flex items-center justify-between h-[46px]">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex h-10 items-center gap-2 rounded-md font-medium px-2"
-          >
-            <div className="p-1.5 bg-primary/10 rounded-lg">
-              <Brain className="w-4 h-4 text-white" />
-            </div>
+        <div className="flex items-center gap-2">
+          {/* Sidebar Toggle */}
+          <SidebarTrigger className="h-8 w-8 text-foreground hover:bg-muted transition-colors" />
 
-            <span className="text-sm font-bold text-white">Visual Brain</span>
-          </Link>
 
           <Button
             variant="ghost"
             size="sm"
-            className="text-sm font-medium text-white flex items-center gap-2"
+            className="text-sm font-medium text-foreground flex items-center gap-2"
           >
             <DollarSign className="w-4 h-4" />
             Pricing
@@ -43,7 +49,7 @@ export default function Navbar() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-sm font-medium text-white flex items-center gap-2"
+            className="text-sm font-medium text-foreground flex items-center gap-2"
           >
             <HelpCircle className="w-4 h-4" />
             Help
@@ -51,7 +57,7 @@ export default function Navbar() {
         </div>
 
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <h1 className="text-sm font-bold text-white">Untitled Project</h1>
+          <h1 className="text-lg font-serif font-bold text-foreground">{projectName || "Untitled Project"}</h1>
         </div>
 
         <div className="flex items-center gap-3">
@@ -59,21 +65,21 @@ export default function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full h-8 w-8 text-white"
+              className="rounded-full h-8 w-8 text-foreground hover:bg-muted"
             >
               <Facebook className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full h-8 w-8 text-white"
+              className="rounded-full h-8 w-8 text-foreground hover:bg-muted"
             >
               <Twitter className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full h-8 w-8 text-white"
+              className="rounded-full h-8 w-8 text-foreground hover:bg-muted"
             >
               <Instagram className="w-4 h-4" />
             </Button>
@@ -85,7 +91,7 @@ export default function Navbar() {
               <Button
                 variant="default"
                 size="sm"
-                className="gap-2 h-8 px-4 cursor-pointer bg-primary text-white"
+                className="gap-2 h-8 px-4 cursor-pointer bg-primary text-primary-foreground"
               >
                 Login
               </Button>

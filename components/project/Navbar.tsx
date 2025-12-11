@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 import { Pencil, Check, X, MessageSquare, Download, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,11 +115,11 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 w-full bg-[#C9B59C] backdrop-blur-md z-40 shrink-0">
+    <header className="sticky top-0 w-full bg-background/60 backdrop-blur-md z-40 shrink-0 border-b border-border/40">
       <div className="w-full max-w-8xl mx-auto px-2 flex items-center justify-between h-[46px]">
         <div className="flex items-center gap-2">
           {/* Sidebar Toggle */}
-          <SidebarTrigger className="h-8 w-8 text-white hover:bg-white/10 transition-colors" />
+          <SidebarTrigger className="h-8 w-8 text-foreground hover:bg-muted transition-colors" />
 
           {/* Tags Display */}
           {tags && tags.length > 0 && (
@@ -146,7 +145,7 @@ export default function Navbar({
                   value={editedName}
                   onChange={(e) => setEditedName(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="h-8 w-64 text-sm"
+                  className="h-8 w-64 text-sm font-serif"
                   autoFocus
                   disabled={isSaving}
                 />
@@ -171,7 +170,7 @@ export default function Navbar({
               </div>
             ) : (
               <div className="flex items-center gap-2 group/title">
-                <h1 className="text-sm font-bold text-background">
+                <h1 className="text-lg font-serif font-bold text-foreground">
                   {projectName}
                 </h1>
                 <Button
@@ -180,7 +179,7 @@ export default function Navbar({
                   className="h-7 w-7 opacity-0 group-hover/title:opacity-100 transition-opacity"
                   onClick={() => setIsEditing(true)}
                 >
-                  <Pencil className="w-3.5 h-3.5 text-muted-background" />
+                  <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
                 </Button>
               </div>
             )}
@@ -194,13 +193,13 @@ export default function Navbar({
             onClick={() => setShowFeedbackModal(true)}
             className="
         gap-2 h-8 px-4
-        bg-forground text-background border border-border
+        bg-foreground text-background border border-border
         shadow-lg
         overflow-hidden relative inline-flex items-center justify-center
         transition-all duration-100
-        [box-shadow:5px_5px_rgb(82_82_82)]
+        [box-shadow:5px_5px_rgba(var(--foreground),0.2)]
         active:translate-x-[3px] active:translate-y-[3px]
-        active:[box-shadow:0px_0px_rgb(82_82_82)]
+        active:[box-shadow:0px_0px_transparent]
         cursor-pointer
     "
           >
@@ -208,7 +207,7 @@ export default function Navbar({
             <span className="text-sm font-medium">Feedback</span>
           </Button>
           <Button
-            className="gap-2 h-8 px-4 cursor-pointer border"
+            className="gap-2 h-8 px-4 cursor-pointer border bg-background text-foreground hover:bg-muted"
             onClick={handleExport}
           >
             <Download className="w-4 h-4" />
@@ -216,7 +215,7 @@ export default function Navbar({
           </Button>
 
           <Button
-            className="gap-2 h-8 px-4 cursor-pointer border bg-background text-foreground"
+            className="gap-2 h-8 px-4 cursor-pointer border bg-background text-foreground hover:bg-muted"
           >
             <Tag className="w-4 h-4" />
             <span className="text-sm font-medium">Pricing</span>

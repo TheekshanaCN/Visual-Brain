@@ -15,7 +15,7 @@ export default function SideToolbar() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true); 
+        setMounted(true);
     }, []);
 
     const handleExport = async () => {
@@ -31,7 +31,8 @@ export default function SideToolbar() {
 
             // Take the snapshot
             const dataUrl = await toPng(viewport, {
-                backgroundColor: theme === 'dark' ? '#0a0a0a' : '#ffffff',
+                // Using hardcoded values that match globals.css constants for canvas export
+                backgroundColor: theme === 'dark' ? '#2a2418' : '#f5eee2',
                 width: viewport.scrollWidth,
                 height: viewport.scrollHeight,
                 style: {

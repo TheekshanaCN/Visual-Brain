@@ -1,55 +1,56 @@
-// proxy.ts (in root directory or src/ directory if you're using it)
 
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { authkitMiddleware, authkit } from '@workos-inc/authkit-nextjs';
 import { NextResponse } from 'next/server';
 
-// Define public routes (accessible without authentication)
-const isPublicRoute = createRouteMatcher([
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/newboard(.*)',
-]);
-
-// Define protected routes (require authentication)
-const isProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/projects(.*)',
-]);
-
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-  const isSignedIn = !!userId;
-
-  // Handle root path - redirect based on auth status
-  if (req.nextUrl.pathname === '/') {
-    if (isSignedIn) {
-      // User is signed in -> redirect to dashboard
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    } else {
-      // User is NOT signed in -> redirect to newboard
-      return NextResponse.redirect(new URL('/newboard', req.url));
+export default authkitMiddleware({
+  middleware: async (req, next) => {
+    const { pathname } = req.nextUrl;
+    
+    // Allow public access to newboard and auth endpoints
+    if (pathname.startsWith('/newboard') || pathname.startsWith('/api/auth')) {
+        return next();
     }
-  }
 
-  // Protect dashboard routes - redirect to sign-in if not authenticated
-  if (isProtectedRoute(req) && !isSignedIn) {
-    return NextResponse.redirect(new URL('/newboard', req.url));
-  }
+    // Check authentication
+    let user = null;
+    try {
+        const authResponse = await authkit(req);
+        user = authResponse.user;
+    } catch (e) {
+        // Validation failed or no session
+    }
 
-  // If user is signed in and tries to access sign-in/sign-up, redirect to dashboard
-  if (isSignedIn && (req.nextUrl.pathname.startsWith('/sign-in') || req.nextUrl.pathname.startsWith('/sign-up'))) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
-  }
+    // Root Redirects: / -> /dashboard (if authed) OR /newboard (if guest)
+    if (pathname === '/') {
+        if (user) {
+            return NextResponse.redirect(new URL('/dashboard', req.url));
+        } else {
+            return NextResponse.redirect(new URL('/newboard', req.url));
+        }
+    }
 
-  // Allow the request to proceed
-  return NextResponse.next();
+    // Protected Routes
+    const protectedPaths = ['/dashboard', '/projects', '/api/projects', '/api/feedback'];
+    const isProtected = protectedPaths.some(path => pathname.startsWith(path));
+
+    if (isProtected && !user) {
+         // API routes should return 401, pages redirect
+         if (pathname.startsWith('/api')) {
+             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+         }
+         return NextResponse.redirect(new URL('/newboard', req.url));
+    }
+
+    return next();
+  }
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    '/',
+    '/newboard/:path*',
+    '/dashboard/:path*',
+    '/projects/:path*',
+    '/api/:path*',
   ],
 };

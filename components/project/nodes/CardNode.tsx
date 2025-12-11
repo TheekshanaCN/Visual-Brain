@@ -18,7 +18,7 @@ export default function CardNode({ data, selected }: CardNodeProps) {
     return (
         <>
             <NodeResizer
-                color="#a1a1aa"
+                color="#c9a66b"
                 isVisible={selected}
                 minWidth={300}
                 minHeight={200}

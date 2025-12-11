@@ -1,11 +1,10 @@
-import { auth } from '@clerk/nextjs/server';
+import { withAuth } from '@workos-inc/authkit-nextjs';
 import { redirect } from 'next/navigation';
 import connectToDatabase from '@/lib/db';
 import Project from '@/models/Project';
 import ProjectInitializer from '@/components/ProjectInitializer';
 import InputSection from '@/components/InputSection';
 import VisualMap from '@/components/VisualMap';
-import SideToolbar from '@/components/SideToolbar';
 import FlowProvider from '@/components/FlowProvider';
 import ProjectNavbarWrapper from '@/components/project/ProjectNavbarWrapper';
 import ProjectCards from '@/components/project/ProjectCards';
@@ -23,16 +22,16 @@ interface ProjectPageProps {
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const { userId } = await auth();
-  if (!userId) {
-    redirect('/sign-in');
+  const { user } = await withAuth();
+  if (!user) {
+    redirect('/newboard');
   }
 
   const { id } = await params;
   await connectToDatabase();
 
   // Use lean() to get a plain JS object, which is serializable
-  const project = await Project.findOne({ _id: id, userId }).lean();
+  const project = await Project.findOne({ _id: id, userId: user.id }).lean();
 
   if (!project) {
     redirect('/dashboard');
@@ -57,7 +56,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         />
 
         {/* Main Content Area */}
-        <main className="relative flex-1 overflow-hidden bg-[#C9B59C] text-foreground selection:bg-primary/30 transition-colors duration-300 p-2">
+        <main className="relative flex-1 overflow-hidden bg-background text-foreground selection:bg-primary/30 transition-colors duration-300 p-2">
           <ProjectInitializer project={serializedProject as any} />
 
           <div className="h-full relative">
@@ -67,7 +66,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 <ProjectCards />
                 <NavigationDock />
                 <InputSection />
-                {/* <SideToolbar /> */}
                 <OnboardingCards />
               </FlowProvider>
             </div>

@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { withAuth } from '@workos-inc/authkit-nextjs';
 import clientPromise from '@/lib/mongodb';
 
 export async function POST(req: Request) {
     try {
-        const { userId } = await auth();
+        const { user } = await withAuth();
         
-        if (!userId) {
+        if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+        const userId = user.id;
 
         const body = await req.json();
         const { category, feedback, projectId } = body;

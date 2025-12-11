@@ -127,7 +127,7 @@ export default function VisualMap() {
         edgesFocusable={true}
       >
         <Background
-          color={isDark ? '#333' : '#e5e7eb'}
+          color={isDark ? '#5c5040' : '#d4c9b8'}
           gap={20}
         />
         {/* <Controls className={`${isDark ? 'bg-black/50 border-white/10 text-white fill-white' : 'bg-white/50 border-black/10 text-black fill-black'} backdrop-blur-md rounded-lg border shadow-lg`} /> */}

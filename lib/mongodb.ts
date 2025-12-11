@@ -6,6 +6,11 @@ const options = {};
 let client;
 let clientPromise: Promise<MongoClient>;
 
+// Extend the global type to include our MongoDB client promise
+declare global {
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
+
 if (!global._mongoClientPromise) {
   client = new MongoClient(uri, options);
   global._mongoClientPromise = client.connect();

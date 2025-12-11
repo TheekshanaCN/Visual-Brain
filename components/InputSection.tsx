@@ -190,7 +190,7 @@ export default function InputSection() {
         initial={{ width: '400px' }}
         animate={{ width: isFocused || inputValue ? '650px' : '400px' }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className={`pointer-events-auto relative flex items-end gap-2 p-2 rounded-3xl glass-premium shadow-premium transition-colors duration-300 ${isFocused ? 'ring-2 ring-primary/20' : ''}`}
+        className={`pointer-events-auto bg-card relative flex items-end gap-2 p-2 rounded-3xl glass-premium shadow-premium transition-colors duration-300 ${isFocused ? 'ring-2 ring-primary/20' : ''}`}
       >
         <div className="flex-shrink-0 p-5">
           <Sparkles className={`w-5 h-5 transition-colors ${isFocused ? 'text-primary' : 'text-muted-foreground'}`} />

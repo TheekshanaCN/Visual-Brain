@@ -1,11 +1,3 @@
-"use client";
-
-
-
 export default function Home() {
-  return (
-    <>
-      
-    </>
-  )
+  return null; // Logic handled in middleware
 }

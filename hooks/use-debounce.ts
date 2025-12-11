@@ -27,7 +27,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,
   delay: number
 ) {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const callbackRef = useRef(callback);
 
   // Update callback if it changes
@@ -64,7 +64,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
 export function useDebouncedSearch(initialValue: string = '', delay: number = 300) {
   const [value, setValue] = useState(initialValue);
   const [debouncedValue, setDebouncedValue] = useState(initialValue);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleChange = useCallback(
     (newValue: string) => {

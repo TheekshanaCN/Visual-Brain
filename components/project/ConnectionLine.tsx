@@ -13,7 +13,7 @@ export default function ConnectionLine({ startX, startY, endX, endY }: Connectio
     // Create a path string that updates whenever the motion values change
     const pathD = useTransform(
         [startX, startY, endX, endY],
-        ([sx, sy, ex, ey]) => {
+        ([sx, sy, ex, ey]: number[]) => {
             // Adjust start and end points to be relative to the card centers/edges
             // Assuming cards are roughly 300-400px wide. 
             // We'll connect from the right side of start to left side of end for now, 

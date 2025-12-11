@@ -9,8 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.35.4",
-    "@clerk/themes": "^2.4.39",
     "@google/generative-ai": "^0.24.1",
     "@icons-pack/react-simple-icons": "^13.8.0",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -28,6 +26,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-visually-hidden": "^1.2.4",
     "@vercel/analytics": "^1.5.0",
+    "@workos-inc/authkit-nextjs": "^2.12.0",
     "@xyflow/react": "^12.9.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

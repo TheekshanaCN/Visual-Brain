@@ -1,6 +1,5 @@
 "use client"
 
-import { useClerk } from "@clerk/nextjs"
 import {
     BadgeCheck,
     Bell,
@@ -40,15 +39,16 @@ export function NavUser({
     }
 }) {
     const { isMobile } = useSidebar()
-    const { signOut, openUserProfile } = useClerk()
+
+    // Helper to handle sign out
+    const handleSignOut = () => {
+        window.location.href = '/api/auth/logout';
+    };
 
     const getInitials = (name: string) => {
         return name
-            .split(' ')
-            .map(word => word[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2)
+            ? name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
+            : 'U';
     }
 
     return (
@@ -95,17 +95,17 @@ export function NavUser({
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem onClick={() => openUserProfile()}>
+                            <DropdownMenuItem>
                                 <BadgeCheck />
                                 Account
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openUserProfile()}>
+                            <DropdownMenuItem>
                                 <Settings />
                                 Settings
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => signOut({ redirectUrl: '/' })}>
+                        <DropdownMenuItem onClick={handleSignOut}>
                             <LogOut />
                             Log out
                         </DropdownMenuItem>
