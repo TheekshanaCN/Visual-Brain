@@ -1,56 +1,52 @@
-
-import { authkitMiddleware, authkit } from '@workos-inc/authkit-nextjs';
-import { NextResponse } from 'next/server';
+import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
+import { NextRequest, NextResponse } from 'next/server';
 
 export default authkitMiddleware({
-  middleware: async (req, next) => {
-    const { pathname } = req.nextUrl;
-    
-    // Allow public access to newboard and auth endpoints
-    if (pathname.startsWith('/newboard') || pathname.startsWith('/api/auth')) {
-        return next();
+  middlewareAuth: {
+    enabled: true,
+    unauthenticatedPaths: ['/newboard', '/'],
+  },
+  async afterAuth(req: NextRequest, session) {
+    const path = req.nextUrl.pathname;
+
+    // Protected routes that require authentication
+    const protectedRoutes = ['/dashboard', '/projects'];
+    const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
+
+    // If user is NOT logged in
+    if (!session) {
+      // If trying to access protected routes, redirect to /newboard
+      if (isProtectedRoute) {
+        const newboardUrl = new URL('/newboard', req.url);
+        return NextResponse.redirect(newboardUrl);
+      }
+      // Allow access to public routes
+      return NextResponse.next();
     }
 
-    // Check authentication
-    let user = null;
-    try {
-        const authResponse = await authkit(req);
-        user = authResponse.user;
-    } catch (e) {
-        // Validation failed or no session
+    // If user IS logged in
+    if (session) {
+      // If on /newboard or root, redirect to /dashboard
+      if (path === '/newboard' || path === '/') {
+        const dashboardUrl = new URL('/dashboard', req.url);
+        return NextResponse.redirect(dashboardUrl);
+      }
     }
 
-    // Root Redirects: / -> /dashboard (if authed) OR /newboard (if guest)
-    if (pathname === '/') {
-        if (user) {
-            return NextResponse.redirect(new URL('/dashboard', req.url));
-        } else {
-            return NextResponse.redirect(new URL('/newboard', req.url));
-        }
-    }
-
-    // Protected Routes
-    const protectedPaths = ['/dashboard', '/projects', '/api/projects', '/api/feedback'];
-    const isProtected = protectedPaths.some(path => pathname.startsWith(path));
-
-    if (isProtected && !user) {
-         // API routes should return 401, pages redirect
-         if (pathname.startsWith('/api')) {
-             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-         }
-         return NextResponse.redirect(new URL('/newboard', req.url));
-    }
-
-    return next();
-  }
+    // Allow all other requests to proceed
+    return NextResponse.next();
+  },
 });
 
 export const config = {
   matcher: [
-    '/',
-    '/newboard/:path*',
-    '/dashboard/:path*',
-    '/projects/:path*',
-    '/api/:path*',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (public folder)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
