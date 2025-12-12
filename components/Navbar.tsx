@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Brain, Menu, Moon, Sun, User } from "lucide-react";
+import { Italic, Menu, Moon, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,19 +60,22 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-          ? "bg-background/80 backdrop-blur-md border-b border-border py-3 shadow-sm"
-          : "bg-transparent py-5"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${scrolled
+        ? "stone-glass py-3 shadow-stone"
+        : "bg-transparent py-5"
         }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-            <Brain className="w-6 h-6 text-primary" />
+          <div className="flex items-center space-x-3">
+            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center overflow-hidden transition-all duration-300 hover:scale-110 hover:from-accent/90 hover:to-accent/40">
+              <Italic className="w-5 h-5 text-accent-foreground relative z-10 transition-transform duration-300 hover:rotate-12" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent transition-opacity duration-300 hover:opacity-50" />
+            </div>
+            <span className="font-serif text-2xl text-foreground">
+              Idea<span className="text-[#d4b999]">Forge</span>
+            </span>
           </div>
-          <span className="text-xl font-bold text-foreground">
-            Visual Brain
-          </span>
         </Link>
 
         {/* Desktop Navigation */}

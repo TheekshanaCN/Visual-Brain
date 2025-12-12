@@ -90,7 +90,7 @@ export default function FeedbackModal({ open, onClose, projectId }: FeedbackModa
                 Share Your Feedback
               </DialogTitle>
               <DialogDescription>
-                Help us improve Visual Brain by sharing your thoughts, ideas, or reporting issues.
+                Help us improve IdeaForge by sharing your thoughts, ideas, or reporting issues.
               </DialogDescription>
             </DialogHeader>
 
@@ -102,11 +102,10 @@ export default function FeedbackModal({ open, onClose, projectId }: FeedbackModa
                     <button
                       key={category.id}
                       onClick={() => setFeedbackCategory(category.id)}
-                      className={`p-3 rounded-lg border-2 transition-all text-left ${
-                        feedbackCategory === category.id
+                      className={`p-3 rounded-lg border-2 transition-all text-left ${feedbackCategory === category.id
                           ? "border-primary bg-primary/5 shadow-sm"
                           : "border-border hover:border-primary/50 hover:bg-accent"
-                      }`}
+                        }`}
                     >
                       <div className="text-sm font-medium">{category.label}</div>
                     </button>

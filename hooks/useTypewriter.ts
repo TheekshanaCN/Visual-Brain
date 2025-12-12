@@ -1,15 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const PLACEHOLDERS = [
-  "Ask Visual Brain anything...",
-  "Paste your messy notes here...",
-  "Summarize this article...",
-  "Create a roadmap for learning React...",
-  "Brainstorm marketing ideas...",
-  "Explain quantum computing..."
+"Tell About Your Idea ....",
+"EX: AI-powered Todo App",
+"Explain Your Next Unicorn ....",
+"EX: SaaS to automate Telegram shops",
+"Pitch Your Next Big Thing ....",
+"EX: SaaS For Hotel Management",
+"Describe Your Million-Dollar Idea ....",
+"EX: Personalized Fitness Bot",
+"Share Your Startup Vision ....",
+"EX: Platform to manage freelance clients",
+"Outline Your Next Innovation ....",
+"EX: AI code review assistant",
+"Bring Your Idea to Life",
+"EX: Subscription-based e-learning platform",
+"Sketch Your Idea in Words",
+"EX: Chrome extension to track productivity",
 ];
 
 export function useTypewriter(placeholders: string[] = PLACEHOLDERS) {

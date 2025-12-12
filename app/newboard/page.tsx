@@ -27,7 +27,7 @@ export default function ProjectPage() {
       <AppSidebar />
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
         {/* Navbar - Now part of the flex layout, not fixed */}
-        <ProjectNavbarWrapper projectId="ssssss" initialProjectName="untitle" />
+        <ProjectNavbarWrapper projectId="unicorn" initialProjectName="Your Next Unicorn" />
 
         {/* Main Content Area */}
         <main className="relative flex-1 overflow-hidden bg-background text-foreground selection:bg-primary/30 transition-colors duration-300 p-2">
@@ -47,7 +47,7 @@ export default function ProjectPage() {
           <div className="md:hidden absolute inset-0 z-50 bg-background/80 flex items-center justify-center p-8 text-center backdrop-blur-sm">
             <div className="max-w-sm">
               <p className="text-muted-foreground mb-4">
-                Please use a larger screen for the best Visual Brain experience.
+                Please use a larger screen for the best experience.
               </p>
               <p className="text-xs text-muted-foreground/70">
                 Minimum recommended width: 768px

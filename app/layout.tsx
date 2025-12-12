@@ -21,11 +21,11 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Visual Brain",
-  description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps. By Theekshana.",
+  title: "IdeaForge | Idea To Reality",
+  description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps.",
   openGraph: {
-    title: "Visual Brain",
-    description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps. By Theekshana.",
+    title: "IdeaForge",
+    description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps.",
     images: ["/og-image.JPG"],
   },
 };

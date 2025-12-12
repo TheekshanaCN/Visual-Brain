@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Brain, Plus, Sun, Moon } from "lucide-react"
+import { Italic, Plus, Sun, Moon } from "lucide-react"
 import { AuthModal } from "../AuthModal";
 
 import {
@@ -50,15 +50,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuButton
                 size="lg"
                 onClick={() => router.push("/dashboard")}
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 group"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 group cursor-pointer"
               >
-                <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg shadow-sm group-hover:scale-105 transition-transform duration-200">
-                  <Brain className="size-4" />
+                <div className="bg-gradient-to-br from-accent to-accent/60 text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg shadow-sm group-hover:scale-105 transition-transform duration-200 cursor-pointer">
+                  <Italic className="w-4 h-4 text-accent-foreground relative z-10 transition-transform duration-300 hover:rotate-12" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-serif font-bold tracking-wide">Visual Brain</span>
+                  <span className="truncate font-serif font-bold tracking-wide">Idea<span className="text-[#d4b999]">Forge</span></span>
                   <span className="truncate text-xs text-muted-foreground">
-                    AI Project Planner
+                    Idea to Reality
                   </span>
                 </div>
               </SidebarMenuButton>

@@ -221,7 +221,7 @@ html {
   
   /* Subtle focus ring */
   *:focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-1 ring-offset-background;
+    @apply outline-none;
   }
   
   /* Custom selection */
@@ -433,4 +433,56 @@ html {
   .stone-button-secondary {
     display: none;
   }
+}
+
+/* Background Patterns */
+.bg-grid-stone {
+  background-size: 40px 40px;
+  background-image: linear-gradient(to right, var(--stone-200) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--stone-200) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.dark .bg-grid-stone {
+  background-image: linear-gradient(to right, var(--stone-800) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--stone-800) 1px, transparent 1px);
+}
+
+.bg-dots-stone {
+  background-image: radial-gradient(var(--stone-300) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
+}
+
+.dark .bg-dots-stone {
+  background-image: radial-gradient(var(--stone-800) 1px, transparent 1px);
+}
+
+/* Refined Glass Effect */
+.stone-glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.dark .stone-glass {
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Premium Card Hover */
+.premium-card-hover {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.premium-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); 
+}
+
+.dark .premium-card-hover:hover {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+  border-color: var(--stone-700);
 }

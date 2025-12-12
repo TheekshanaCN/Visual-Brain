@@ -40,9 +40,9 @@ export default function OnboardingCards() {
                             initial={{ y: -20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.4, delay: 0.1 }}
-                            className="text-5xl font-serif text-center text-white mb-12 italic drop-shadow-2xl"
+                            className="text-5xl font-serif text-center text-mute mb-12 italic drop-shadow-2xl"
                         >
-                            How to Use SandBoard
+                            How to Use <span className="underline decoration-[#d4b999]">IdeaForge</span>
                         </motion.h1>
 
                         {/* Cards Container */}

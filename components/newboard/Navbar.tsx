@@ -30,7 +30,7 @@ export default function Navbar({
   }, []);
 
   return (
-    <header className="sticky top-0 w-full bg-background/60 backdrop-blur-md z-40 shrink-0 border-b border-border/40">
+    <header className="sticky top-0 w-full stone-glass z-40 shrink-0 border-b border-border/40">
       <div className="w-full max-w-8xl mx-auto px-2 flex items-center justify-between h-[46px]">
         <div className="flex items-center gap-2">
           {/* Sidebar Toggle */}

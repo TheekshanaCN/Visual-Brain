@@ -75,7 +75,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <div className="md:hidden absolute inset-0 z-50 bg-background/80 flex items-center justify-center p-8 text-center backdrop-blur-sm">
             <div className="max-w-sm">
               <p className="text-muted-foreground mb-4">
-                Please use a larger screen for the best Visual Brain experience.
+                Please use a larger screen for the best experience.
               </p>
               <p className="text-xs text-muted-foreground/70">
                 Minimum recommended width: 768px
