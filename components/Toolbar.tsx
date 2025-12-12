@@ -17,12 +17,12 @@ export default function Toolbar() {
         width: viewport.scrollWidth,
         height: viewport.scrollHeight,
         style: {
-            width: '100%',
-            height: '100%',
-            transform: 'scale(1)',
+          width: '100%',
+          height: '100%',
+          transform: 'scale(1)',
         }
       });
-      
+
       const link = document.createElement('a');
       link.download = 'visual-brain-snapshot.png';
       link.href = dataUrl;
@@ -35,17 +35,17 @@ export default function Toolbar() {
   if (nodes.length === 0) return null;
 
   return (
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+    <div className="absolute bottom-8 right-8 z-10 flex gap-2">
       <button
         onClick={handleExport}
-        className="bg-black/40 backdrop-blur-md border border-white/10 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/10 transition-all flex items-center gap-2"
+        className="bg-card/60 backdrop-blur-md border border-border text-foreground px-4 py-2 rounded-full text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-all flex items-center gap-2 shadow-lg"
       >
         <Download className="w-4 h-4" />
         Export Snapshot
       </button>
       <button
         onClick={reset}
-        className="bg-black/40 backdrop-blur-md border border-white/10 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500/20 hover:text-red-400 transition-all flex items-center gap-2"
+        className="bg-card/60 backdrop-blur-md border border-border text-foreground px-4 py-2 rounded-full text-sm font-medium hover:bg-destructive/10 hover:text-destructive transition-all flex items-center gap-2 shadow-lg"
       >
         <RotateCcw className="w-4 h-4" />
         Reset

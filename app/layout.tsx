@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
@@ -13,15 +13,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: "400",
+  style: "normal",
+});
+
 export const metadata: Metadata = {
-  title: "Visual Brain",
-  description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps. By Theekshana.",
+  title: "IdeaForge | Idea To Reality",
+  description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps.",
   openGraph: {
-    title: "Visual Brain",
-    description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps. By Theekshana.",
+    title: "IdeaForge",
+    description: "Turn messy ideas, notes, and links into clear, visual, structured insights with actionable next steps.",
     images: ["/og-image.JPG"],
   },
 };
+
+import { AuthKitProvider } from '@workos-inc/authkit-nextjs/components';
+import { Toaster } from 'sonner';
+import { ThemeProvider } from "@/components/theme-provider"
 
 export default function RootLayout({
   children,
@@ -29,13 +40,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-        <Analytics />
-      </body>
-    </html>
+    <AuthKitProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased`}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster position="bottom-right" />
+            <Analytics />
+          </ThemeProvider>
+        </body>
+      </html>
+    </AuthKitProvider>
   );
 }

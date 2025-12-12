@@ -1,156 +1,249 @@
 'use client';
-'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/lib/store';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, ArrowUp, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTypewriter } from '@/hooks/useTypewriter';
 
 export default function InputSection() {
-  const [input, setInput] = useState('');
-  const { setIsProcessing, setClusters, setInsight, setNodes, setEdges, reset } = useStore();
-  const [localProcessing, setLocalProcessing] = useState(false); // LOCK
-  const [error, setError] = useState<string | null>(null);
+  const {
+    inputValue,
+    setInputValue,
+    setIsProcessing,
+    setClusters,
+    setInsight,
+    setNodes,
+    setEdges,
+    setTags,
+    setIdeaId,
+    reset,
+    nodes
+  } = useStore();
+  const [localProcessing, setLocalProcessing] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const placeholderText = useTypewriter();
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
+    }
+  }, [inputValue]);
 
   const handleVisualize = async () => {
-    if (!input.trim() || localProcessing) return; // immediately block
+    if (!inputValue.trim() || localProcessing) return;
 
-    setLocalProcessing(true);   // lock immediately
-    setIsProcessing(true);      // global state
-    setError(null);
-    reset();
+    setLocalProcessing(true);
+    setIsProcessing(true);
+
+    // Don't reset if we are updating an existing map
+    const isUpdate = !!nodes.length;
+    if (!isUpdate) {
+      reset();
+    }
 
     try {
+      // Get current graph data from store if available
+      const currentGraphData = useStore.getState().graphData;
+
       const response = await fetch('/api/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: input }),
+        body: JSON.stringify({
+          text: inputValue,
+          currentMap: isUpdate ? currentGraphData : undefined
+        }),
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
-      }
+      if (!response.ok) throw new Error(data.error);
 
-      if (data.clusters) {
-        setClusters(data.clusters);
+      if (data.root) {
+        // Save the hierarchical data for future updates
+        useStore.getState().setGraphData(data.root);
+
+        // Save the idea ID if present (for tech stack/MVP generation)
+        if (data.id) {
+          setIdeaId(data.id);
+        }
+
+        // Extract tags from insight themes if available
+        const insightTags = data.insight?.themes || [];
+        setTags(insightTags);
 
         const newNodes: any[] = [];
         const newEdges: any[] = [];
-        let clusterIndex = 0;
 
-        const centerX = 500;
-        const centerY = 300;
-        const radius = 300;
+        const centerX = 0;
+        const centerY = 0;
 
-        for (const cluster of data.clusters) {
-          const angle = (clusterIndex / data.clusters.length) * 2 * Math.PI;
-          const clusterX = centerX + radius * Math.cos(angle);
-          const clusterY = centerY + radius * Math.sin(angle);
+        // 1. Create Root Node
+        const rootId = 'root';
+        newNodes.push({
+          id: rootId,
+          position: { x: centerX, y: centerY },
+          data: { label: data.root.label, variant: 'root' },
+          type: 'glass',
+        });
 
-          const clusterId = `cluster-${clusterIndex}`;
+        // 2. Create Main Branches (Radial Layout)
+        const branches = data.root.branches;
+        const branchRadius = 400; // Distance from root
+
+        branches.forEach((branch: any, index: number) => {
+          const angle = (index / branches.length) * 2 * Math.PI - Math.PI / 2; // Start from top
+          const branchX = centerX + branchRadius * Math.cos(angle);
+          const branchY = centerY + branchRadius * Math.sin(angle);
+          const branchId = `branch-${index}`;
+
           newNodes.push({
-            id: clusterId,
-            position: { x: clusterX, y: clusterY },
-            data: { label: cluster.label },
-            type: 'default',
-            style: {
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '50%',
-              width: 200,
-              height: 200,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: '#fff',
-              fontWeight: 'bold',
-              backdropFilter: 'blur(10px)',
-            },
+            id: branchId,
+            position: { x: branchX, y: branchY },
+            data: { label: branch.label, variant: 'branch' },
+            type: 'glass',
           });
 
-          cluster.items.forEach((item: string, itemIndex: number) => {
-            const itemAngle = (itemIndex / cluster.items.length) * 2 * Math.PI;
-            const itemRadius = 80;
-            const itemX = clusterX + itemRadius * Math.cos(itemAngle);
-            const itemY = clusterY + itemRadius * Math.sin(itemAngle);
+          // Edge from Root -> Branch
+          newEdges.push({
+            id: `e-root-${branchId}`,
+            source: rootId,
+            target: branchId,
+            animated: true,
+            style: { stroke: 'var(--primary)', strokeWidth: 2 },
+          });
 
-            const nodeId = `${clusterId}-item-${itemIndex}`;
+          // 3. Create Child Nodes (Cluster around Branch)
+          const children = branch.children;
+          const childRadius = 150; // Distance from branch node
+          const startAngle = angle - Math.PI / 3; // Spread children in a fan shape
+          const totalSpread = (Math.PI * 2) / 3; // 120 degrees spread
+
+          children.forEach((child: string, childIndex: number) => {
+            const childAngle = startAngle + (childIndex / (children.length - 1 || 1)) * totalSpread;
+            // Adjust angle to point away from center
+            const finalChildAngle = angle + (childIndex - (children.length - 1) / 2) * 0.5;
+
+            const childX = branchX + childRadius * Math.cos(finalChildAngle);
+            const childY = branchY + childRadius * Math.sin(finalChildAngle);
+            const childId = `${branchId}-child-${childIndex}`;
+
             newNodes.push({
-              id: nodeId,
-              position: { x: itemX, y: itemY },
-              data: { label: item },
-              type: 'default',
-              style: {
-                backgroundColor: '#3b82f6',
-                color: 'white',
-                borderRadius: '20px',
-                padding: '10px',
-                fontSize: '12px',
-              },
+              id: childId,
+              position: { x: childX, y: childY },
+              data: { label: child, variant: 'child' },
+              type: 'glass',
             });
 
+            // Edge from Branch -> Child
             newEdges.push({
-              id: `e-${clusterId}-${nodeId}`,
-              source: clusterId,
-              target: nodeId,
-              animated: true,
-              style: { stroke: 'rgba(255,255,255,0.3)' },
+              id: `e-${branchId}-${childId}`,
+              source: branchId,
+              target: childId,
+              animated: false,
+              style: { stroke: 'var(--muted-foreground)', opacity: 0.5 },
             });
           });
-
-          clusterIndex++;
-        }
+        });
 
         setNodes(newNodes);
         setEdges(newEdges);
       }
 
       if (data.insight) setInsight(data.insight);
-    } catch (error: any) {
+
+      // Auto-update project name and description if this is a new map
+      if (!isUpdate && data.root && data.insight) {
+        const projectId = useStore.getState().projectId;
+        if (projectId) {
+          try {
+            await fetch(`/api/projects/${projectId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: data.root.label,
+                description: data.insight.summary,
+                ideaId: data.id // Save ideaId to database
+              }),
+            });
+          } catch (error) {
+            console.error('Failed to update project metadata:', error);
+          }
+        }
+      }
+      setInputValue(''); // Clear input after sending
+    } catch (error) {
       console.error('Failed to visualize:', error);
-      setError(error.message || 'Failed to process ideas');
     } finally {
       setIsProcessing(false);
-      setLocalProcessing(false); // unlock
+      setLocalProcessing(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleVisualize();
     }
   };
 
   return (
-    <div className="absolute top-4 left-4 z-10 w-80 bg-black/40 backdrop-blur-md p-4 rounded-xl border border-white/10 shadow-xl">
-      <h2 className="text-white font-semibold mb-3 flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-blue-400" />
-        Visual Brain
-      </h2>
-
-      <textarea
-        className="w-full h-32 bg-black/20 border border-white/10 rounded-lg p-3 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none mb-3"
-        placeholder="Paste your messy ideas, notes, or links here..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-
-      <button
-        onClick={handleVisualize}
-        disabled={localProcessing}
-        className={`w-full bg-blue-600 cursor-pointer hover:bg-blue-500 text-white py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2
-        ${localProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-full flex justify-center px-4 pointer-events-none">
+      <motion.div
+        layout
+        initial={{ width: '400px' }}
+        animate={{ width: isFocused || inputValue ? '650px' : '400px' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className={`pointer-events-auto bg-card relative flex items-end gap-2 p-2 rounded-3xl glass-premium shadow-premium transition-colors duration-300 ${isFocused ? 'ring-2 ring-primary/20' : ''}`}
       >
-        {localProcessing ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Visualizing...
-          </>
-        ) : (
-          'Visualize'
-        )}
-      </button>
-
-      {error && (
-        <div className="mt-3 p-2 bg-red-500/20 border border-red-500/50 rounded-lg text-xs text-red-200 text-center">
-          {error}
+        <div className="flex-shrink-0 p-5">
+          <Sparkles className={`w-5 h-5 transition-colors ${isFocused ? 'text-primary' : 'text-muted-foreground'}`} />
         </div>
-      )}
+
+        <div className="relative w-full">
+          <textarea
+            ref={textareaRef}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="w-full max-h-[200px] py-3 bg-transparent border-none text-foreground
+  focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0
+  outline-none ring-0 resize-none custom-scrollbar text-base z-10 relative"
+            rows={1}
+            style={{ minHeight: '48px' }}
+          />
+
+
+          {/* Typewriter Placeholder */}
+          {!inputValue && (
+            <div className="absolute top-3 left-0 pointer-events-none text-muted-foreground/60 truncate w-full">
+              {placeholderText}
+              <span className="animate-pulse">|</span>
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={handleVisualize}
+          disabled={!inputValue.trim() || localProcessing}
+          className={`flex-shrink-0 p-3 rounded-2xl transition-all duration-200
+            ${inputValue.trim() && !localProcessing
+              ? 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg'
+              : 'bg-muted text-muted-foreground cursor-not-allowed'
+            }`}
+        >
+          {localProcessing ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <ArrowUp className="w-5 h-5" />
+          )}
+        </button>
+      </motion.div>
     </div>
   );
 }
