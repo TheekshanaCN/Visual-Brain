@@ -1,9 +1,10 @@
 'use client';
 
 import { useReactFlow } from '@xyflow/react';
-import { Lightbulb, Code, CheckSquare, ArrowRight, Map, Compass, GripVertical } from 'lucide-react';
+import { Lightbulb, Code, CheckSquare, ArrowRight, Map, Compass, GripVertical, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export default function NavigationDock() {
     const { fitView, setCenter } = useReactFlow();
@@ -36,6 +37,7 @@ export default function NavigationDock() {
         { id: 'card-tech', label: 'Tech Stack', icon: Code, action: () => zoomToNode('card-tech') },
         { id: 'card-mvp', label: 'MVP', icon: CheckSquare, action: () => zoomToNode('card-mvp') },
         { id: 'card-next', label: 'Next Steps', icon: ArrowRight, action: () => zoomToNode('card-next') },
+        { id: 'card-prompt', label: 'Prompt', icon: Sparkles, action: () => zoomToNode('card-prompt'), highlight: true },
     ];
 
     return (
@@ -63,9 +65,14 @@ export default function NavigationDock() {
                             variant="ghost"
                             size="sm"
                             onClick={item.action}
-                            className="h-9 px-3 gap-2 hover:bg-primary/10 hover:text-primary transition-all justify-start cursor-pointer"
+                            className={cn(
+                                "h-9 px-3 gap-2 transition-all justify-start cursor-pointer",
+                                item.highlight
+                                    ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 hover:text-amber-700 font-semibold"
+                                    : "hover:bg-primary/10 hover:text-primary"
+                            )}
                         >
-                            <Icon className="w-4 h-4" />
+                            <Icon className={cn("w-4 h-4", item.highlight && "text-amber-500")} />
                             <span className="text-xs font-medium">{item.label}</span>
                         </Button>
                     );

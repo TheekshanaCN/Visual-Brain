@@ -55,7 +55,8 @@ interface AppState {
   projectId: string | null;
   ideaId: string | null; // ID from the AI service (Raindrop)
   graphData: any; // Store the hierarchical JSON structure
-  
+  prompt: string | null; // Generated prompt for the project
+    
   isProcessing: boolean;
   insightsPanelOpen: boolean;
   inputDockOpen: boolean;
@@ -82,7 +83,8 @@ interface AppState {
   setProjectId: (id: string) => void;
   setIdeaId: (id: string | null) => void;
   setGraphData: (data: any) => void;
-  
+  setPrompt: (prompt: string | null) => void;
+    
   setIsProcessing: (isProcessing: boolean) => void;
   toggleInsightsPanel: () => void;
   setInputDockOpen: (open: boolean) => void;
@@ -102,6 +104,7 @@ export const useStore = create<AppState>((set, get) => ({
   projectId: null,
   ideaId: null,
   graphData: null,
+  prompt: null,
   
   isProcessing: false,
   editingNodeId: null,
@@ -168,7 +171,8 @@ export const useStore = create<AppState>((set, get) => ({
   setProjectId: (id: string) => set({ projectId: id }),
   setIdeaId: (id: string | null) => set({ ideaId: id }),
   setGraphData: (data: any) => set({ graphData: data }),
-  
+  setPrompt: (prompt: string | null) => set({ prompt }),
+    
   setIsProcessing: (isProcessing: boolean) => set({ isProcessing }),
   toggleInsightsPanel: () => set({ insightsPanelOpen: !get().insightsPanelOpen }),
   setInputDockOpen: (open: boolean) => set({ inputDockOpen: open }),
@@ -184,6 +188,7 @@ export const useStore = create<AppState>((set, get) => ({
     tags: [],
     graphData: null,
     ideaId: null,
+    prompt: null,
     isProcessing: false, 
     editingNodeId: null 
   }),

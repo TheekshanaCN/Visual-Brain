@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useStore } from '@/lib/store';
-import { Lightbulb, Code, CheckSquare, ArrowRight } from 'lucide-react';
+import { Lightbulb, Code, CheckSquare, ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CardNodeData } from './nodes/CardNode';
 import KanbanBoard from './KanbanBoard';
@@ -20,7 +20,9 @@ export default function ProjectCards() {
         setMvpChecklist,
         nextSteps,
         setNextSteps,
-        ideaId
+        ideaId,
+        prompt,
+        setPrompt
     } = useStore();
 
     // Add card nodes to the ReactFlow canvas when data exists
@@ -252,6 +254,62 @@ export default function ProjectCards() {
                         />
                     ) : null
                 }
+            },
+            {
+                id: 'card-prompt',
+                position: { x: 300, y: -400 },
+                defaultStyle: { width: 400, height: 400 },
+                data: {
+                    title: 'AI Prompt',
+                    icon: <Sparkles className="w-4 h-4 text-amber-500" />,
+                    hasData: !!prompt,
+                    isGenerating: false,
+                    onGenerate: async () => {
+                        const updateNodeLoading = (isLoading: boolean) => {
+                            setNodes(useStore.getState().nodes.map(n =>
+                                n.id === 'card-prompt'
+                                    ? { ...n, data: { ...n.data, isGenerating: isLoading } }
+                                    : n
+                            ));
+                        };
+
+                        updateNodeLoading(true);
+
+                        try {
+                            if (!ideaId) {
+                                toast.error('No AI ID found. Please generate a map first.');
+                                return;
+                            }
+                            const res = await fetch(`/api/prompt/${ideaId}`, {
+                                method: 'GET',
+                                headers: { 'Content-Type': 'application/json' },
+                            });
+
+                            if (!res.ok) {
+                                const errText = await res.text();
+                                throw new Error(`Generation failed: ${res.status} ${errText}`);
+                            }
+
+                            const data = await res.json();
+                            // Assuming data.prompt is the string we want. 
+                            // Adjust if the API returns just { "text": "..." } or similar, but used 'prompt' in plan.
+                            const promptText = data.prompt || data.text || (typeof data === 'string' ? data : JSON.stringify(data));
+
+                            setPrompt(promptText);
+                            toast.success('Prompt generated!');
+                        } catch (error) {
+                            console.error(error);
+                            toast.error('Failed to generate Prompt');
+                        } finally {
+                            updateNodeLoading(false);
+                        }
+                    },
+                    content: prompt ? (
+                        <div className="p-4 bg-muted/20 rounded-lg border border-border/50 h-full overflow-y-auto text-sm leading-relaxed whitespace-pre-wrap font-mono">
+                            {prompt}
+                        </div>
+                    ) : null
+                }
             }
         ];
 
@@ -269,15 +327,19 @@ export default function ProjectCards() {
                 if (existingIndex !== -1) {
                     const existingNode = newNodes[existingIndex];
                     // Merge data
-                    newNodes[existingIndex] = {
-                        ...existingNode,
-                        data: {
-                            ...existingNode.data,
-                            ...def.data
-                        }
-                    };
-                    // We assume data changed because dependencies (insight, etc) changed
-                    hasChanges = true;
+                    const isDifferent = JSON.stringify(existingNode.data) !== JSON.stringify({ ...existingNode.data, ...def.data });
+
+                    if (isDifferent) {
+                        newNodes[existingIndex] = {
+                            ...existingNode,
+                            data: {
+                                ...existingNode.data,
+                                ...def.data
+                            }
+                        };
+                        hasChanges = true;
+                    }
+
                 } else {
                     newNodes.push({
                         id: def.id,
@@ -294,7 +356,7 @@ export default function ProjectCards() {
             return hasChanges ? newNodes : currentNodes;
         });
 
-    }, [insight, techStack, mvpChecklist, nextSteps, setNodes]);
+    }, [insight, techStack, mvpChecklist, nextSteps, prompt, setNodes]);
 
     // This component doesn't render anything - it just manages card nodes
     return null;
