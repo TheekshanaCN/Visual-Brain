@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export default authkitMiddleware({
   middlewareAuth: {
     enabled: true,
-    unauthenticatedPaths: ['/newboard', '/'],
+    unauthenticatedPaths: ['/', '/newboard', '/pricing'],
   },
   async afterAuth(req: NextRequest, session) {
     const path = req.nextUrl.pathname;

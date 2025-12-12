@@ -38,6 +38,7 @@ export default function Navbar({
 
 
           <Button
+            onClick={() => window.open("/pricing", "_blank")}
             variant="ghost"
             size="sm"
             className="text-sm font-medium text-foreground flex items-center gap-2"

@@ -98,7 +98,7 @@ export function NavProjects({
                             >
                                 <button onClick={() => handleProjectClick(project._id)}>
                                     <FolderOpen className="size-4" />
-                                    <span className="truncate">{project.name}</span>
+                                    <span className="truncate cursor-pointer">{project.name}</span>
                                     {project._id === currentProjectId && (
                                         <span className="ml-auto flex h-2 w-2">
                                             <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
@@ -109,7 +109,7 @@ export function NavProjects({
                             </SidebarMenuButton>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <SidebarMenuAction showOnHover>
+                                    <SidebarMenuAction showOnHover className="cursor-pointer">
                                         <MoreHorizontal />
                                         <span className="sr-only">More</span>
                                     </SidebarMenuAction>
@@ -119,14 +119,14 @@ export function NavProjects({
                                     side={isMobile ? "bottom" : "right"}
                                     align={isMobile ? "end" : "start"}
                                 >
-                                    <DropdownMenuItem onClick={() => handleProjectClick(project._id)}>
+                                    <DropdownMenuItem onClick={() => handleProjectClick(project._id)} className="cursor-pointer">
                                         <ExternalLink className="text-muted-foreground" />
                                         <span>Open Project</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                         onClick={() => handleDeleteProject(project._id)}
-                                        className="text-destructive focus:text-destructive"
+                                        className="text-destructive focus:text-destructive cursor-pointer"
                                     >
                                         <Trash2 className="text-destructive" />
                                         <span>Delete Project</span>

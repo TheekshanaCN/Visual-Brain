@@ -100,7 +100,7 @@ export default function Navbar({
       });
 
       const link = document.createElement("a");
-      link.download = "visual-brain-snapshot.png";
+      link.download = "ideaforge-snapshot.png";
       link.href = dataUrl;
       link.click();
     } catch (error) {
@@ -215,11 +215,13 @@ export default function Navbar({
           </Button>
 
           <Button
+            onClick={() => window.open("/pricing", "_blank")}
             className="gap-2 h-8 px-4 cursor-pointer border bg-background text-foreground hover:bg-muted"
           >
             <Tag className="w-4 h-4" />
             <span className="text-sm font-medium">Pricing</span>
           </Button>
+
         </div>
       </div>
 

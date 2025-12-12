@@ -109,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={handleNewProject}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] transition-all shadow-sm active:scale-95"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground/90 hover:scale-[1.02] transition-all shadow-sm active:scale-95 cursor-pointer"
               >
                 <Plus className="size-4" />
                 <span className="font-medium">New Project</span>
@@ -125,6 +125,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuButton
                 onClick={() => router.push("/dashboard")}
                 tooltip="Dashboard"
+                className="cursor-pointer"
               >
                 <LayoutDashboard className="size-4" />
                 <span>Dashboard</span>

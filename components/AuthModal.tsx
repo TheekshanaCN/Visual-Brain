@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { getSignIn, getSignUp } from "@/app/actions/auth";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface AuthModalProps {
   mode: "sign-in" | "sign-up";
@@ -19,18 +19,8 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ mode, trigger }: AuthModalProps) {
-  const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    async function fetchUrl() {
-      // Fetch URL only when modal is opened to ensure freshness or fetch eagerly
-      // For simplicity, we can fetch on click or eagerly. 
-      // WorkOS URLs are usually static or generated quickly.
-    }
-    fetchUrl();
-  }, []);
 
   const handleAuth = async () => {
     setLoading(true);
@@ -43,40 +33,104 @@ export function AuthModal({ mode, trigger }: AuthModalProps) {
     }
   };
 
-  const title = mode === "sign-in" ? "Welcome Back" : "Create Account";
-  const desc = mode === "sign-in"
-    ? "Enter your credentials to access your workspace."
-    : "Get started with Visual Brain today.";
-  const buttonText = mode === "sign-in" ? "Sign In" : "Sign Up";
+  const handleSignup = async () => {
+    setLoading(true);
+    try {
+      const authUrl = mode === "sign-up" ? await getSignIn() : await getSignUp();
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error("Failed to get auth url", error);
+      setLoading(false);
+    }
+  };
+
+
+  const isSignIn = mode === "sign-in";
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            {desc}
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+
+      <DialogContent className="sm:max-w-md rounded-2xl p-8 shadow-xl border bg-background/95 backdrop-blur-md">
+        <DialogHeader className="space-y-2 text-center">
+          {/* Main Title */}
+          <DialogTitle className="text-4xl leading-tight tracking-tight text-center">
+            <span className="font-serif italic font-bold">Ideas</span> Into <span className="font-serif italic font-bold">Reality</span>
+          </DialogTitle>
+
+          {/* Subtitle */}
+          <DialogDescription className="text-md font-bold text-muted-foreground text-center">
+            {isSignIn ? (
+              <>
+                Log in to{" "}
+                <span className="text-foreground">
+                  Idea<span className="text-[#d4b999]">Forge</span>
+                </span>
+              </>
+            ) : (
+              <>
+                Create your{" "}
+                <span className="text-foreground">
+                  Idea<span className="text-[#d4b999]">Forge</span>
+                </span>{" "}
+                account
+              </>
+            )}
           </DialogDescription>
+
         </DialogHeader>
-        <div className="flex flex-col gap-4 py-4">
-          {/* We can add visuals here if needed */}
-          <div className="flex flex-col gap-2">
-            <Button
-              size="lg"
-              className="w-full gap-2 relative overflow-hidden"
-              onClick={handleAuth}
-              disabled={loading}
+
+        <div className="flex flex-col gap-6 pt-6">
+          {/* Auth button */}
+          <Button
+            size="lg"
+            className="w-full h-11 text-base font-medium rounded-xl transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+            onClick={handleAuth}
+            disabled={loading}
+          >
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSignIn ? "Log In" : "Sign Up"}
+          </Button>
+
+          {/* Switch between sign in / sign up */}
+          <div className="text-center text-sm">
+            {isSignIn ? (
+              <>
+                <span className="text-muted-foreground">Don't have an account? </span>
+                <button
+                  onClick={handleSignup}
+                  className="underline underline-offset-4 hover:text-foreground transition-colors cursor-pointer"
+                >
+                  Sign up
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="text-muted-foreground">Already have an account? </span>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="underline underline-offset-4 hover:text-foreground transition-colors"
+                >
+                  Sign in
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Footer Links */}
+          <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground mt-2">
+            <a
+              href="/terms"
+              className="underline underline-offset-4 hover:text-foreground transition-colors"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {buttonText} with WorkOS
-              <ArrowRight className="h-4 w-4 ml-auto opacity-50" />
-            </Button>
-            <p className="text-xs text-center text-muted-foreground mt-2">
-              Secure authentication powered by WorkOS.
-            </p>
+              Terms of Service
+            </a>
+            <a
+              href="/privacy"
+              className="underline underline-offset-4 hover:text-foreground transition-colors"
+            >
+              Privacy Policy
+            </a>
           </div>
         </div>
       </DialogContent>

@@ -177,7 +177,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-4">
                     <div>
                         <h1 className="text-3xl font-semibold mb-1.5 tracking-tight">
-                            Projects
+                            PROJECTS
                         </h1>
                         <p className="text-sm text-muted-foreground">
                             {projects.length} {projects.length === 1 ? 'project' : 'projects'}
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                     </div>
                     <Button
                         size="default"
-                        className="gap-2 h-10 px-5"
+                        className="gap-2 h-10 px-5 cursor-pointer"
                         onClick={handleCreateProject}
                         disabled={creating}
                     >
