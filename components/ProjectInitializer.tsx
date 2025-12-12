@@ -11,7 +11,7 @@ interface ProjectInitializerProps {
 
 export default function ProjectInitializer({ project }: ProjectInitializerProps) {
     const {
-        setNodes, setEdges, setClusters, setInsight, setTechStack, setMvpChecklist, setNextSteps, setTags, setProjectId, setGraphData,
+        setNodes, setEdges, setClusters, setInsight, setTechStack, setMvpChecklist, setNextSteps, setTags, setProjectId, setIdeaId, setGraphData,
         nodes, edges, clusters, insight, techStack, mvpChecklist, nextSteps, tags, graphData
     } = useStore();
     const initialized = useRef(false);
@@ -24,6 +24,9 @@ export default function ProjectInitializer({ project }: ProjectInitializerProps)
             useStore.getState().reset();
 
             setProjectId(project._id.toString());
+            if (project.ideaId) {
+                setIdeaId(project.ideaId);
+            }
 
             if (project.data) {
                 // Sanitize nodes to ensure all labels are strings
@@ -52,7 +55,7 @@ export default function ProjectInitializer({ project }: ProjectInitializerProps)
             }
             initialized.current = true;
         }
-    }, [project, setNodes, setEdges, setClusters, setInsight, setTechStack, setMvpChecklist, setNextSteps, setTags, setProjectId, setGraphData]);
+    }, [project, setNodes, setEdges, setClusters, setInsight, setTechStack, setMvpChecklist, setNextSteps, setTags, setProjectId, setIdeaId, setGraphData]);
 
     // Auto-save
     useEffect(() => {

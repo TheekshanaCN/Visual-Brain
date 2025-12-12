@@ -44,7 +44,7 @@ export async function PUT(
     const userId = user.id;
 
     const { id } = await params;
-    const { name, description, data } = await req.json();
+    const { name, description, data, ideaId } = await req.json();
 
     await connectToDatabase();
     const project = await Project.findOne({ _id: id, userId });
@@ -56,6 +56,7 @@ export async function PUT(
     if (name) project.name = name;
     if (description !== undefined) project.description = description;
     if (data) project.data = data;
+    if (ideaId) project.ideaId = ideaId;
 
     await project.save();
 

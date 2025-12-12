@@ -4,6 +4,7 @@ export interface IProject extends Document {
   name: string;
   description?: string;
   userId: string;
+  ideaId?: string; // Raindrop Idea ID
   data: any; // The visual brain graph data
   createdAt: Date;
   updatedAt: Date;
@@ -25,6 +26,10 @@ const ProjectSchema: Schema = new Schema(
       type: String,
       required: [true, 'User ID is required'],
       index: true,
+    },
+    ideaId: {
+      type: String,
+      required: false,
     },
     data: {
       type: Schema.Types.Mixed,

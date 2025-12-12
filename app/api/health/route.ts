@@ -3,45 +3,34 @@ import { NextResponse } from 'next/server';
 const AIUrl = process.env.RAINDROP_BACKEND_URL;
 const APIKey = process.env.RAINDROP_API_KEY;
 
-export async function POST(req: Request) {
+export async function GET() {
   try {
-    const body = await req.json();
-    const { text } = body;
-
-    if (!text || typeof text !== 'string') {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
-    }
-
     if (!AIUrl) {
       console.error('RAINDROP_BACKEND_URL is not defined');
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    const response = await fetch(`${AIUrl}/process`, {
-      method: 'POST',
+    const response = await fetch(`${AIUrl}/health`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': APIKey || '',
       },
-      body: JSON.stringify({ text }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Raindrop API Error:', response.status, errorText);
+      console.error('Raindrop Health API Error:', response.status, errorText);
       return NextResponse.json(
-        { error: `AI Processing Failed: ${response.statusText}` },
+        { error: `Health Check Failed: ${response.statusText}` },
         { status: response.status }
       );
     }
 
     const data = await response.json();
-    // Unwrap the response if it's wrapped in a 'data' property (as per user example)
-    const unwrappedData = data.data || data;
-    return NextResponse.json(unwrappedData);
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('AI Proxy Error:', error);
+    console.error('Health Proxy Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-

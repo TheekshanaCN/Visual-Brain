@@ -19,7 +19,8 @@ export default function ProjectCards() {
         mvpChecklist,
         setMvpChecklist,
         nextSteps,
-        setNextSteps
+        setNextSteps,
+        ideaId
     } = useStore();
 
     // Add card nodes to the ReactFlow canvas when data exists
@@ -117,13 +118,14 @@ export default function ProjectCards() {
                         updateNodeLoading(true);
 
                         try {
-                            const res = await fetch('/api/process', {
-                                method: 'POST',
+                            // Use ideaId returned from the initial process call
+                            if (!ideaId) {
+                                toast.error('No AI ID found. Please generate a map first.');
+                                return;
+                            }
+                            const res = await fetch(`/api/tech-stack/${ideaId}`, {
+                                method: 'GET',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    text: insight?.summary || "SaaS Project",
-                                    type: 'tech-stack'
-                                }),
                             });
 
                             if (!res.ok) {
@@ -179,13 +181,13 @@ export default function ProjectCards() {
                         updateNodeLoading(true);
 
                         try {
-                            const res = await fetch('/api/process', {
-                                method: 'POST',
+                            if (!ideaId) {
+                                toast.error('No AI ID found. Please generate a map first.');
+                                return;
+                            }
+                            const res = await fetch(`/api/mvp/${ideaId}`, {
+                                method: 'GET',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    text: insight?.summary || "SaaS Project",
-                                    type: 'mvp'
-                                }),
                             });
 
                             if (!res.ok) {

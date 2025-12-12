@@ -53,6 +53,7 @@ interface AppState {
   nextSteps: NextStepItem[];
   tags: string[];
   projectId: string | null;
+  ideaId: string | null; // ID from the AI service (Raindrop)
   graphData: any; // Store the hierarchical JSON structure
   
   isProcessing: boolean;
@@ -79,6 +80,7 @@ interface AppState {
   setNextSteps: (steps: NextStepItem[]) => void;
   setTags: (tags: string[]) => void;
   setProjectId: (id: string) => void;
+  setIdeaId: (id: string | null) => void;
   setGraphData: (data: any) => void;
   
   setIsProcessing: (isProcessing: boolean) => void;
@@ -98,6 +100,7 @@ export const useStore = create<AppState>((set, get) => ({
   nextSteps: [],
   tags: [],
   projectId: null,
+  ideaId: null,
   graphData: null,
   
   isProcessing: false,
@@ -163,6 +166,7 @@ export const useStore = create<AppState>((set, get) => ({
   setNextSteps: (nextSteps: NextStepItem[]) => set({ nextSteps }),
   setTags: (tags: string[]) => set({ tags }),
   setProjectId: (id: string) => set({ projectId: id }),
+  setIdeaId: (id: string | null) => set({ ideaId: id }),
   setGraphData: (data: any) => set({ graphData: data }),
   
   setIsProcessing: (isProcessing: boolean) => set({ isProcessing }),
@@ -179,6 +183,7 @@ export const useStore = create<AppState>((set, get) => ({
     nextSteps: [],
     tags: [],
     graphData: null,
+    ideaId: null,
     isProcessing: false, 
     editingNodeId: null 
   }),

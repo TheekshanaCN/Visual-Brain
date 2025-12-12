@@ -16,6 +16,7 @@ export default function InputSection() {
     setNodes,
     setEdges,
     setTags,
+    setIdeaId,
     reset,
     nodes
   } = useStore();
@@ -64,6 +65,11 @@ export default function InputSection() {
       if (data.root) {
         // Save the hierarchical data for future updates
         useStore.getState().setGraphData(data.root);
+
+        // Save the idea ID if present (for tech stack/MVP generation)
+        if (data.id) {
+          setIdeaId(data.id);
+        }
 
         // Extract tags from insight themes if available
         const insightTags = data.insight?.themes || [];
@@ -159,7 +165,8 @@ export default function InputSection() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 name: data.root.label,
-                description: data.insight.summary
+                description: data.insight.summary,
+                ideaId: data.id // Save ideaId to database
               }),
             });
           } catch (error) {
