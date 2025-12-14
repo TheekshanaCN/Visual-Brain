@@ -11,8 +11,8 @@ interface ProjectInitializerProps {
 
 export default function ProjectInitializer({ project }: ProjectInitializerProps) {
     const {
-        setNodes, setEdges, setClusters, setInsight, setTechStack, setMvpChecklist, setNextSteps, setTags, setProjectId, setIdeaId, setGraphData, setPrompt,
-        nodes, edges, clusters, insight, techStack, mvpChecklist, nextSteps, tags, graphData, prompt
+        setNodes, setEdges, setClusters, setInsight, setTechStack, setMvpChecklist, setNextSteps, setTags, setProjectId, setIdeaId, setGraphData, setPrompt, setProjectName, setProjectDescription,
+        nodes, edges, clusters, insight, techStack, mvpChecklist, nextSteps, tags, graphData, prompt, projectName, projectDescription
     } = useStore();
     const initialized = useRef(false);
     const saveTimeout = useRef<NodeJS.Timeout>(null);
@@ -24,6 +24,8 @@ export default function ProjectInitializer({ project }: ProjectInitializerProps)
             useStore.getState().reset();
 
             setProjectId(project._id.toString());
+            setProjectName(project.name);
+            if (project.description) setProjectDescription(project.description);
             if (project.ideaId) {
                 setIdeaId(project.ideaId);
             }

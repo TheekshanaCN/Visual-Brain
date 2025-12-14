@@ -1,10 +1,12 @@
+//model/Project.ts
+
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IProject extends Document {
   name: string;
   description?: string;
   userId: string;
-  ideaId?: string; // Raindrop Idea ID
+  ideaId: string | null; // Idea ID defult null
   data: any; // The visual brain graph data
   createdAt: Date;
   updatedAt: Date;
@@ -30,6 +32,7 @@ const ProjectSchema: Schema = new Schema(
     ideaId: {
       type: String,
       required: false,
+      default: null,
     },
     data: {
       type: Schema.Types.Mixed,
