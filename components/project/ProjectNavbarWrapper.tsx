@@ -10,13 +10,16 @@ interface ProjectNavbarWrapperProps {
 }
 
 export default function ProjectNavbarWrapper({ projectId, initialProjectName }: ProjectNavbarWrapperProps) {
-    const [projectName, setProjectName] = useState(initialProjectName);
-    const { tags } = useStore();
+    const { tags, projectName, setProjectName } = useStore();
+
+    // Use initialProjectName as fallback if store hasn't loaded yet (though initializer runs first)
+    // or if we are verifying SSR hydration.
+    const displayName = projectName || initialProjectName;
 
     return (
         <Navbar
             projectId={projectId}
-            projectName={projectName}
+            projectName={displayName}
             onProjectNameUpdate={setProjectName}
             tags={tags}
         />

@@ -55,17 +55,24 @@ interface AppState {
   projectId: string | null;
   ideaId: string | null; // ID from the AI service (Raindrop)
   graphData: any; // Store the hierarchical JSON structure
-  
+  prompt: string | null; // Generated prompt for the project
+
   isProcessing: boolean;
   insightsPanelOpen: boolean;
   inputDockOpen: boolean;
   inputValue: string;
   editingNodeId: string | null;
-  
+
+  projectName: string | null;
+  projectDescription: string | null;
+
+  setProjectName: (name: string) => void;
+  setProjectDescription: (description: string) => void;
+
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: (connection: Connection) => void;
-  
+
   setNodes: (nodes: Node[] | ((prevNodes: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[]) => void;
   addNode: (node: Node) => void;
@@ -82,7 +89,8 @@ interface AppState {
   setProjectId: (id: string) => void;
   setIdeaId: (id: string | null) => void;
   setGraphData: (data: any) => void;
-  
+  setPrompt: (prompt: string | null) => void;
+
   setIsProcessing: (isProcessing: boolean) => void;
   toggleInsightsPanel: () => void;
   setInputDockOpen: (open: boolean) => void;
@@ -102,7 +110,10 @@ export const useStore = create<AppState>((set, get) => ({
   projectId: null,
   ideaId: null,
   graphData: null,
-  
+  prompt: null,
+  projectName: null,
+  projectDescription: null,
+
   isProcessing: false,
   editingNodeId: null,
   insightsPanelOpen: true,
@@ -131,7 +142,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
   setEdges: (edges: Edge[]) => set({ edges }),
   addNode: (node: Node) => set({ nodes: [...(get().nodes || []), node] }),
-  
+
   addManualNode: (position: { x: number; y: number }, label?: string) => {
     const newNode: Node = {
       id: `manual-${Date.now()}`,
@@ -141,24 +152,24 @@ export const useStore = create<AppState>((set, get) => ({
     };
     set({ nodes: [...(get().nodes || []), newNode] });
   },
-  
+
   deleteNode: (nodeId: string) => {
     const nodes = (get().nodes || []).filter(node => node.id !== nodeId);
     const edges = get().edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId);
     set({ nodes, edges });
   },
-  
+
   updateNodeLabel: (nodeId: string, label: string) => {
-    const nodes = (get().nodes || []).map(node => 
-      node.id === nodeId 
+    const nodes = (get().nodes || []).map(node =>
+      node.id === nodeId
         ? { ...node, data: { ...node.data, label } }
         : node
     );
     set({ nodes });
   },
-  
+
   setEditingNodeId: (nodeId: string | null) => set({ editingNodeId: nodeId }),
-  
+
   setClusters: (clusters: Cluster[]) => set({ clusters }),
   setInsight: (insight: Insight) => set({ insight }),
   setTechStack: (techStack: TechItem[]) => set({ techStack }),
@@ -168,23 +179,30 @@ export const useStore = create<AppState>((set, get) => ({
   setProjectId: (id: string) => set({ projectId: id }),
   setIdeaId: (id: string | null) => set({ ideaId: id }),
   setGraphData: (data: any) => set({ graphData: data }),
-  
+  setPrompt: (prompt: string | null) => set({ prompt }),
+  setProjectName: (name: string) => set({ projectName: name }),
+  setProjectDescription: (description: string) => set({ projectDescription: description }),
+
   setIsProcessing: (isProcessing: boolean) => set({ isProcessing }),
   toggleInsightsPanel: () => set({ insightsPanelOpen: !get().insightsPanelOpen }),
   setInputDockOpen: (open: boolean) => set({ inputDockOpen: open }),
   setInputValue: (value: string) => set({ inputValue: value }),
-  reset: () => set({ 
-    nodes: [], 
-    edges: [], 
-    clusters: [], 
-    insight: null, 
+  reset: () => set({
+    nodes: [],
+    edges: [],
+    clusters: [],
+    insight: null,
     techStack: [],
     mvpChecklist: [],
     nextSteps: [],
     tags: [],
     graphData: null,
     ideaId: null,
-    isProcessing: false, 
-    editingNodeId: null 
+    prompt: null,
+    projectName: null,
+    projectDescription: null,
+    isProcessing: false,
+    editingNodeId: null
   }),
 }));
+

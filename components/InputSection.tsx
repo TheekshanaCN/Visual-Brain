@@ -17,6 +17,8 @@ export default function InputSection() {
     setEdges,
     setTags,
     setIdeaId,
+    setProjectName,
+    setProjectDescription,
     reset,
     nodes
   } = useStore();
@@ -155,19 +157,38 @@ export default function InputSection() {
 
       if (data.insight) setInsight(data.insight);
 
-      // Auto-update project name and description if this is a new map
-      if (!isUpdate && data.root && data.insight) {
+      // Auto-update project name/description and ALWAYS save ideaId
+      if (data.root && data.insight) {
+
+        // Update local store immediately for UI
+        setProjectName(data.root.label);
+        setProjectDescription(data.insight.summary);
+
         const projectId = useStore.getState().projectId;
         if (projectId) {
           try {
+            const updatePayload: any = {
+              ideaId: data.id // Always attempt to save ideaId if present
+            };
+
+            // Only update name and description if it's a fresh map to avoid overwriting user edits
+            // OR if user explicitly wants it updated (based on conversation, they want it "when generate the map need update")
+            // Assuming "make when generate the map" implies for any generation.
+            // However, sticking to original plan of "fresh map" to be safe unless re-confirmed, 
+            // BUT wait, user said "make when generate the map... update the project Title". 
+            // If I update the store, the UI updates. The backend update below is what persists it.
+            // PROMPT said: "when generate the map need update the project Title as that name"
+            // So I should arguably update it in DB too even if isUpdate is true?
+            // "so i need make when generate the map need update the project Title as that name"
+            // This implies overwriting. I will update the logic to overwrite.
+
+            updatePayload.name = data.root.label;
+            updatePayload.description = data.insight.summary;
+
             await fetch(`/api/projects/${projectId}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                name: data.root.label,
-                description: data.insight.summary,
-                ideaId: data.id // Save ideaId to database
-              }),
+              body: JSON.stringify(updatePayload),
             });
           } catch (error) {
             console.error('Failed to update project metadata:', error);

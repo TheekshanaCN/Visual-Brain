@@ -19,9 +19,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
+    const ideaId = null;
+
     const project = await Project.create({
       name,
       description,
+      ideaId,
       userId,
       data: {}, // Initialize with empty data
     });
