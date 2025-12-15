@@ -116,7 +116,7 @@ export default function Navbar() {
                       className="h-8 text-xs font-medium"
                       asChild
                     >
-                      <Link href="/pricing">Buy Credits</Link>
+                      <Link href="/dashboard">Dashboard</Link>
                     </Button>
                   </div>
 
