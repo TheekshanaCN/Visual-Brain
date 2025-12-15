@@ -20,7 +20,8 @@ export default function InputSection() {
     setProjectName,
     setProjectDescription,
     reset,
-    nodes
+    nodes,
+    setOutOfCreditsModalOpen
   } = useStore();
   const [localProcessing, setLocalProcessing] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -59,6 +60,11 @@ export default function InputSection() {
           currentMap: isUpdate ? currentGraphData : undefined
         }),
       });
+
+      if (response.status === 402) {
+        setOutOfCreditsModalOpen(true);
+        throw new Error("Insufficient credits");
+      }
 
       const data = await response.json();
 

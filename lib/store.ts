@@ -63,6 +63,9 @@ interface AppState {
   inputValue: string;
   editingNodeId: string | null;
 
+  isOutOfCreditsModalOpen: boolean;
+  setOutOfCreditsModalOpen: (open: boolean) => void;
+
   projectName: string | null;
   projectDescription: string | null;
 
@@ -116,6 +119,8 @@ export const useStore = create<AppState>((set, get) => ({
 
   isProcessing: false,
   editingNodeId: null,
+  isOutOfCreditsModalOpen: false,
+  setOutOfCreditsModalOpen: (open: boolean) => set({ isOutOfCreditsModalOpen: open }),
   insightsPanelOpen: true,
   inputDockOpen: false,
   inputValue: '',
