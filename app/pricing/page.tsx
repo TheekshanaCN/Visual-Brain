@@ -11,6 +11,7 @@ import { toast } from "sonner";
 interface Plan {
     name: string;
     credits: number;
+    planId: string;
     price: number;
     description: string;
     features: string[];
@@ -50,8 +51,7 @@ export default function PricingPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    credits: plan.credits,
-                    amount: plan.price,
+                    planId: plan.planId
                 }),
             });
 
@@ -165,8 +165,8 @@ export default function PricingPage() {
 
                             <CardFooter className="pt-0 pb-8">
                                 <Button
-                                    className="w-full h-11 font-medium cursor-pointer"
-                                    variant={plan.popular ? "default" : "outline"}
+                                    className={plan.popular ? "w-full h-11 font-medium cursor-pointer" : "w-full h-11 font-medium bg-background/10 border border-white text-white hover:text-white hover:bg-background cursor-pointer"}
+                                    variant={plan.popular ? "default" : "default"}
                                     onClick={() => handlePurchase(plan)}
                                     disabled={loading === plan.name}
                                 >

@@ -29,6 +29,7 @@ export async function getAdminPricingSettings(): Promise<IAdminPricingSettings> 
             plans: [
                 {
                     name: "Starter",
+                    planId: "pg_starter",
                     credits: 500,
                     price: 5,
                     description: "Perfect for trying out the platform",
@@ -36,6 +37,7 @@ export async function getAdminPricingSettings(): Promise<IAdminPricingSettings> 
                 },
                 {
                     name: "Pro",
+                    planId: "pg_pro",
                     credits: 1200,
                     price: 10,
                     popular: true,
@@ -44,6 +46,7 @@ export async function getAdminPricingSettings(): Promise<IAdminPricingSettings> 
                 },
                 {
                     name: "Power",
+                    planId: "pg_power",
                     credits: 5000,
                     price: 35,
                     description: "For heavy power users",

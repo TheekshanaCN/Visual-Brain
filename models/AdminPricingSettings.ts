@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IPricingPlan {
     name: string;
     credits: number;
+    planId: string;
     price: number;
     description: string;
     features: string[];
@@ -19,6 +20,7 @@ const AdminPricingSettingsSchema: Schema = new Schema(
             {
                 name: { type: String, required: true },
                 credits: { type: Number, required: true },
+                planId: { type: String, required: true },
                 price: { type: Number, required: true },
                 description: { type: String, required: true },
                 features: [{ type: String }],
