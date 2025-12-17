@@ -6,15 +6,32 @@ export interface IAdminCreditSettings extends Document {
     cardGenerationCost: number;
 }
 
-const AdminCreditSettingsSchema: Schema = new Schema(
+const AdminCreditSettingsSchema = new Schema<IAdminCreditSettings>(
     {
-        defaultUserCredits: { type: Number, default: 500 },
-        mapGenerationCost: { type: Number, default: 10 },
-        cardGenerationCost: { type: Number, default: 5 },
+        defaultUserCredits: {
+            type: Number,
+            required: true,
+        },
+        mapGenerationCost: {
+            type: Number,
+            required: true,
+        },
+        cardGenerationCost: {
+            type: Number,
+            required: true,
+        },
     },
-    { collection: 'admin_credits' }
+    {
+        collection: 'admin_credits',
+        timestamps: true,
+    }
 );
 
-const AdminCreditSettings: Model<IAdminCreditSettings> = mongoose.models.AdminCreditSettings || mongoose.model<IAdminCreditSettings>('AdminCreditSettings', AdminCreditSettingsSchema);
+const AdminCreditSettings =
+    mongoose.models.AdminCreditSettings ||
+    mongoose.model<IAdminCreditSettings>(
+        'AdminCreditSettings',
+        AdminCreditSettingsSchema
+    );
 
 export default AdminCreditSettings;
