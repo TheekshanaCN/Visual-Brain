@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Italic, Menu, Moon, Sun, User, Coins } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,9 @@ export default function Navbar() {
   const [signUpUrl, setSignUpUrl] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -33,25 +37,34 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    async function loadAuth() {
-      try {
-        const [u, inUrl, upUrl] = await Promise.all([
-          getCurrentUser(),
-          getSignIn(),
-          getSignUp()
-        ]);
-        setUser(u);
-        setSignInUrl(inUrl);
-        setSignUpUrl(upUrl);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+  const loadAuth = async () => {
+    try {
+      const [u, inUrl, upUrl] = await Promise.all([
+        getCurrentUser(),
+        getSignIn(),
+        getSignUp()
+      ]);
+      setUser(u);
+      setSignInUrl(inUrl);
+      setSignUpUrl(upUrl);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadAuth();
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      loadAuth();
+      // Remove the query parameter to avoid repeated refetches
+      router.replace(window.location.pathname);
+    }
+  }, [searchParams, router]);
 
   const handleSignOut = async () => {
     const url = await getSignOutUrl();

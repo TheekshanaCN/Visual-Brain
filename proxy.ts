@@ -1,7 +1,7 @@
 import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
 
 // Public routes (unauthenticated)
-const unauthenticatedPaths = ['/', '/newboard', '/pricing', '/api/pricing'];
+const unauthenticatedPaths = ['/', '/newboard', '/pricing', '/api/pricing', '/api/stripe/webhook', '/api/auth/signin-url'];
 
 export default authkitMiddleware({
   middlewareAuth: {

@@ -1,13 +1,22 @@
+//api/stripe/checkout/route.ts
+
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getCurrentUser } from '@/app/actions/auth';
-import { CREDIT_PLANS, CreditPlanId } from '@/lib/credit-plans';
+import { getCreditPlan } from '@/lib/server/credit-plans';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
     try {
-        const user = await getCurrentUser();
+        let user;
+        try {
+            user = await getCurrentUser();
+        } catch (authError) {
+            console.error('[AUTH_ERROR]', authError);
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
         if (!user) {
             return new NextResponse('Unauthorized', { status: 401 });
         }
@@ -15,7 +24,7 @@ export async function POST(req: Request) {
         // only accept planId
         const { planId } = await req.json();
 
-        const selectedPlan = CREDIT_PLANS[planId as CreditPlanId];
+        const selectedPlan = await getCreditPlan(planId);
         if (!selectedPlan) {
             return new NextResponse('Invalid plan', { status: 400 });
         }
@@ -34,8 +43,8 @@ export async function POST(req: Request) {
                 credits: selectedPlan.credits.toString(),
                 planId,
             },
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
+            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?success=false`,
         });
 
         return NextResponse.json({ url: session.url });

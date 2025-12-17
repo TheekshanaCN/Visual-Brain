@@ -7,16 +7,7 @@ import Navbar from '@/components/pricing/Navbar';
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-
-interface Plan {
-    name: string;
-    credits: number;
-    planId: string;
-    price: number;
-    description: string;
-    features: string[];
-    popular?: boolean;
-}
+import { Plan, fetchPricingPlans, handleCheckout, getSignInUrl } from "@/lib/pricing-client";
 
 export default function PricingPage() {
     const router = useRouter();
@@ -27,13 +18,11 @@ export default function PricingPage() {
     useEffect(() => {
         const fetchPlans = async () => {
             try {
-                const res = await fetch('/api/pricing');
-                if (res.ok) {
-                    const data = await res.json();
-                    setPlans(data);
-                }
+                const data = await fetchPricingPlans();
+                setPlans(data);
             } catch (error) {
                 console.error("Failed to fetch pricing plans", error);
+                toast.error("Failed to load pricing plans");
             } finally {
                 setIsLoadingPlans(false);
             }
@@ -43,27 +32,26 @@ export default function PricingPage() {
     }, []);
 
     const handlePurchase = async (plan: Plan) => {
+        setLoading(plan.name);
+
         try {
-            setLoading(plan.name);
-            const response = await fetch("/api/stripe/checkout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    planId: plan.planId
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to start checkout");
-            }
-
-            const { url } = await response.json();
+            const { url } = await handleCheckout(plan.planId);
             window.location.href = url;
-        } catch (error) {
-            console.error(error);
-            toast.error("Something went wrong. Please try again.");
+        } catch (err) {
+            // Check if it's an auth error
+            if (err instanceof Error && err.message === "UNAUTHORIZED") {
+                toast.error("Please sign in to purchase credits.");
+                try {
+                    const { url } = await getSignInUrl();
+                    window.location.href = url;
+                } catch (signInError) {
+                    toast.error("Failed to redirect to sign in page");
+                    console.error("Sign in redirect failed:", signInError);
+                }
+            } else {
+                toast.error("Failed to process checkout. Please try again.");
+                console.error("Checkout error:", err);
+            }
         } finally {
             setLoading(null);
         }
