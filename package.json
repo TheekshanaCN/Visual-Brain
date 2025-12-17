@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@icons-pack/react-simple-icons": "^13.8.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -31,10 +30,10 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.23.24",
     "html-to-image": "^1.11.13",
     "lucide-react": "^0.554.0",
-    "media-chrome": "^4.16.1",
     "mongodb": "^7.0.0",
     "mongoose": "^9.0.0",
     "next": "16.0.10",
@@ -43,6 +42,7 @@
     "react-dom": "19.2.0",
     "react-fast-marquee": "^1.6.5",
     "sonner": "^2.0.7",
+    "stripe": "^20.0.0",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.8"
   },

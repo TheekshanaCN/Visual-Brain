@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Italic, Plus, LayoutDashboard, Sun, Moon } from "lucide-react";
 import { getCurrentUser } from "@/app/actions/auth";
+import { OutOfCreditsModal } from "@/components/modals/out-of-credits-modal";
 
 import { NavProjects } from "@/components/sidebar/nav-projects";
 import { NavUser } from "@/components/sidebar/nav-user";
@@ -51,6 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           name: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : "User",
           email: user.email || "",
           avatar: user.profilePictureUrl || "",
+          credits: (user as any).credits ?? 0,
         });
       }
     } catch (error) {
@@ -166,6 +168,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {userData ? <NavUser user={userData} /> : <div className="p-4 text-xs text-muted-foreground">Loading user...</div>}
       </SidebarFooter>
       <SidebarRail />
+      <OutOfCreditsModal />
     </Sidebar>
   );
 }

@@ -6,6 +6,7 @@ import {
     ChevronsUpDown,
     LogOut,
     Settings,
+    Coins,
 } from "lucide-react"
 
 import {
@@ -36,6 +37,7 @@ export function NavUser({
         name: string
         email: string
         avatar: string
+        credits: number
     }
 }) {
     const { isMobile } = useSidebar()
@@ -70,6 +72,10 @@ export function NavUser({
                                 <span className="truncate font-medium">{user.name}</span>
                                 <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                             </div>
+                            <div className="flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full ml-1">
+                                <Coins className="size-3" />
+                                <span>{user.credits}</span>
+                            </div>
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
@@ -93,6 +99,14 @@ export function NavUser({
                                 </div>
                             </div>
                         </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="flex justify-between">
+                            <span className="flex items-center gap-2">
+                                <Coins className="size-4" />
+                                Credits
+                            </span>
+                            <span className="font-bold">{user.credits}</span>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem>

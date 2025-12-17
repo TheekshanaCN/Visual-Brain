@@ -11,7 +11,22 @@ export async function GET(
     const { id } = await params;
 
     if (!id) {
-       return NextResponse.json({ error: 'Project ID is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 });
+    }
+
+    const user = await import('@/app/actions/auth').then(mod => mod.getCurrentUser());
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { deductCredits } = await import('@/lib/user-utils');
+    const { getAdminCreditSettings } = await import('@/lib/admin-config');
+
+    const settings = await getAdminCreditSettings();
+    const hasCredits = await deductCredits(user.workosId, settings.cardGenerationCost);
+
+    if (!hasCredits) {
+      return NextResponse.json({ error: 'Insufficient credits' }, { status: 402 });
     }
 
     if (!AIUrl) {

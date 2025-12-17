@@ -21,9 +21,32 @@ export default function ProjectCards() {
         nextSteps,
         setNextSteps,
         ideaId,
+        setIdeaId,
+        projectId,
         prompt,
-        setPrompt
+        setPrompt,
+        setOutOfCreditsModalOpen
     } = useStore();
+
+    // Sync ideaId from DB if missing
+    useEffect(() => {
+        if (!ideaId && projectId) {
+            const fetchProjectIdeaId = async () => {
+                try {
+                    const res = await fetch(`/api/projects/${projectId}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.ideaId) {
+                            setIdeaId(data.ideaId);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Failed to sync ideaId", error);
+                }
+            };
+            fetchProjectIdeaId();
+        }
+    }, [ideaId, projectId, setIdeaId]);
 
     // Add card nodes to the ReactFlow canvas when data exists
     useEffect(() => {
@@ -120,15 +143,37 @@ export default function ProjectCards() {
                         updateNodeLoading(true);
 
                         try {
-                            // Use ideaId returned from the initial process call
-                            if (!ideaId) {
+                            // Get fresh ideaId from store
+                            let currentIdeaId = useStore.getState().ideaId;
+                            const currentProjectId = useStore.getState().projectId;
+
+                            // If missing, try one last attempt to fetch from project
+                            if (!currentIdeaId && currentProjectId) {
+                                try {
+                                    const pRes = await fetch(`/api/projects/${currentProjectId}`);
+                                    if (pRes.ok) {
+                                        const pData = await pRes.json();
+                                        if (pData.ideaId) {
+                                            currentIdeaId = pData.ideaId;
+                                            useStore.getState().setIdeaId(pData.ideaId);
+                                        }
+                                    }
+                                } catch (e) { console.error("Failed to fetch ideaId just-in-time", e); }
+                            }
+
+                            if (!currentIdeaId) {
                                 toast.error('No AI ID found. Please generate a map first.');
                                 return;
                             }
-                            const res = await fetch(`/api/tech-stack/${ideaId}`, {
+                            const res = await fetch(`/api/tech-stack/${currentIdeaId}`, {
                                 method: 'GET',
                                 headers: { 'Content-Type': 'application/json' },
                             });
+
+                            if (res.status === 402) {
+                                setOutOfCreditsModalOpen(true);
+                                throw new Error("Insufficient credits");
+                            }
 
                             if (!res.ok) {
                                 const errText = await res.text();
@@ -183,14 +228,35 @@ export default function ProjectCards() {
                         updateNodeLoading(true);
 
                         try {
-                            if (!ideaId) {
+                            let currentIdeaId = useStore.getState().ideaId;
+                            const currentProjectId = useStore.getState().projectId;
+
+                            if (!currentIdeaId && currentProjectId) {
+                                try {
+                                    const pRes = await fetch(`/api/projects/${currentProjectId}`);
+                                    if (pRes.ok) {
+                                        const pData = await pRes.json();
+                                        if (pData.ideaId) {
+                                            currentIdeaId = pData.ideaId;
+                                            useStore.getState().setIdeaId(pData.ideaId);
+                                        }
+                                    }
+                                } catch (e) { console.error("Failed to fetch ideaId just-in-time", e); }
+                            }
+
+                            if (!currentIdeaId) {
                                 toast.error('No AI ID found. Please generate a map first.');
                                 return;
                             }
-                            const res = await fetch(`/api/mvp/${ideaId}`, {
+                            const res = await fetch(`/api/mvp/${currentIdeaId}`, {
                                 method: 'GET',
                                 headers: { 'Content-Type': 'application/json' },
                             });
+
+                            if (res.status === 402) {
+                                setOutOfCreditsModalOpen(true);
+                                throw new Error("Insufficient credits");
+                            }
 
                             if (!res.ok) {
                                 const errText = await res.text();
@@ -276,14 +342,35 @@ export default function ProjectCards() {
                         updateNodeLoading(true);
 
                         try {
-                            if (!ideaId) {
+                            let currentIdeaId = useStore.getState().ideaId;
+                            const currentProjectId = useStore.getState().projectId;
+
+                            if (!currentIdeaId && currentProjectId) {
+                                try {
+                                    const pRes = await fetch(`/api/projects/${currentProjectId}`);
+                                    if (pRes.ok) {
+                                        const pData = await pRes.json();
+                                        if (pData.ideaId) {
+                                            currentIdeaId = pData.ideaId;
+                                            useStore.getState().setIdeaId(pData.ideaId);
+                                        }
+                                    }
+                                } catch (e) { console.error("Failed to fetch ideaId just-in-time", e); }
+                            }
+
+                            if (!currentIdeaId) {
                                 toast.error('No AI ID found. Please generate a map first.');
                                 return;
                             }
-                            const res = await fetch(`/api/prompt/${ideaId}`, {
+                            const res = await fetch(`/api/prompt/${currentIdeaId}`, {
                                 method: 'GET',
                                 headers: { 'Content-Type': 'application/json' },
                             });
+
+                            if (res.status === 402) {
+                                setOutOfCreditsModalOpen(true);
+                                throw new Error("Insufficient credits");
+                            }
 
                             if (!res.ok) {
                                 const errText = await res.text();
